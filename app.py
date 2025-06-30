@@ -409,7 +409,7 @@ async def chat():
                     "limit_type": rate_check["limit_type"],
                     "limit": rate_check["limit"],
                     "reset_time": rate_check["reset_time"],
-                    "upgrade_url": "https://www.firststepai.tech/upgrade",
+                    "upgrade_url": "https://www.firststepai.tech/pticing",
                     "current_tier": user_tier,
                     "status": "rate_limited"
                 }), 429
@@ -465,9 +465,9 @@ async def chat():
         # Add crisis resources if detected
         if crisis_detected:
             api_response["emergency_resources"] = {
-                "crisis_support": "https://www.firststepai.tech/crisis-support",
-                "emergency_contact": "crisis@firststepai.com",
-                "community_support": "https://www.firststepai.tech/community",
+                "crisis_support": "https://www.firststepai.tech/contact",
+                "emergency_contact": "support@firststepai.tech",
+                "community_support": "https://www.firststepai.tech/contact",
                 "message": "We're here to help. You're not alone in this journey."
             }
             api_response["tier_override"] = True
