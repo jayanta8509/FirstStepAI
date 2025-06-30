@@ -372,7 +372,7 @@ RATE_LIMITING_STRICT=true
 ```env
 DEBUG=false
 LOG_LEVEL=WARNING
-CORS_ORIGINS=https://firststepai.com
+CORS_ORIGINS=www.firststepai.tech
 SSL_ENABLED=true
 ```
 
