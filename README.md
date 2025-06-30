@@ -209,7 +209,7 @@ curl -X POST http://localhost:8999/chat \
 1. Visit [Supabase](https://app.supabase.com/)
 2. Create new project
 3. Go to Settings → API
-4. Copy `Project URL` and `anon public` key
+4. Copy `Project URL` and `service_rolesecret` key
 5. Create the required table:
 
 ```sql
