@@ -104,6 +104,9 @@ client old code/
 # # With output redirection  I use this
 # nohup python app.py > app.log 2>&1 & 
 
+# for digital ocean
+#nohup python3 app.py > app.log 2>&1 & 
+
 # # Check if it's running
 # ps aux | grep python
 
