@@ -24,6 +24,16 @@ import re
 from dotenv import load_dotenv
 from Classification_qury import analyze_query, detect_crisis, validate_tier_access, get_available_ais
 from store_data_supabase import store_data_supabase
+from firststep_redis import (
+    redis_manager, 
+    get_daily_token_usage, 
+    update_daily_token_usage, 
+    get_teaser_usage, 
+    update_teaser_usage,
+    store_conversation,
+    increment_metric,
+    redis_health_check
+)
 
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -34,79 +44,152 @@ deepseek_api_key = os.getenv("DEEPSEEK_API_KEY")
 quart_app = Quart(__name__)
 quart_app = cors(quart_app)
 
-# FirstStepAI Business Configuration
+# FirstStepAI Business Configuration - All tiers access all models with different token allocations
 TIER_ACCESS = {
-    "wanderer": ["jarvis"],                           # Free
-    "builder": ["jarvis", "celine"],                  # $9/month
-    "architect": ["jarvis", "celine", "elonix"],      # $29/month
-    "awakener": ["jarvis", "celine", "elonix", "optimus"]  # $99/month
+    "wanderer": ["jarvis", "celine", "elonix", "optimus"],   # Free - All models available
+    "builder": ["jarvis", "celine", "elonix", "optimus"],    # $9/month - All models available
+    "architect": ["jarvis", "celine", "elonix", "optimus"],  # $29/month - All models available
+    "awakener": ["jarvis", "celine", "elonix", "optimus"]    # $99/month - All models available
 }
 
-RATE_LIMITS = {
-    "wanderer": {"requests_per_minute": 10, "daily_limit": 50},
-    "builder": {"requests_per_minute": 30, "daily_limit": 1000},
-    "architect": {"requests_per_minute": 60, "daily_limit": 5000},
-    "awakener": {"requests_per_minute": 100, "daily_limit": -1}  # Unlimited
-}
-
-# In-memory rate limiting storage (use Redis in production)
-user_requests = {}
-user_daily_counts = {}
-
-def reset_daily_counts():
-    """Reset daily counts at midnight"""
-    global user_daily_counts
-    user_daily_counts = {}
-
-def check_rate_limits(user_id: str, user_tier: str) -> Dict:
-    """Check if user has exceeded rate limits"""
-    current_time = time.time()
-    current_date = datetime.now().strftime("%Y-%m-%d")
-    
-    limits = RATE_LIMITS.get(user_tier, RATE_LIMITS["wanderer"])
-    
-    # Initialize user data if needed
-    if user_id not in user_requests:
-        user_requests[user_id] = []
-    if user_id not in user_daily_counts:
-        user_daily_counts[user_id] = {}
-    if current_date not in user_daily_counts[user_id]:
-        user_daily_counts[user_id][current_date] = 0
-    
-    # Clean old requests (older than 1 minute)
-    user_requests[user_id] = [
-        req_time for req_time in user_requests[user_id] 
-        if current_time - req_time < 60
-    ]
-    
-    # Check minute limit
-    minute_count = len(user_requests[user_id])
-    if minute_count >= limits["requests_per_minute"]:
-        return {
-            "allowed": False,
-            "error": "Rate limit exceeded",
-            "limit_type": "per_minute",
-            "limit": limits["requests_per_minute"],
-            "reset_time": 60 - (current_time - min(user_requests[user_id]))
+# Token-based system configuration
+TOKEN_LIMITS = {
+    "wanderer": {
+        "daily_token_limit": 1000,
+        "teaser_mode": {
+            "queries": 3,
+            "tokens_per_query": 1200
+        },
+        "normal_allocation": {
+            "jarvis": 0.55,
+            "celine": 0.10,
+            "optimus": 0.30,
+            "elonix": 0.05
         }
+    },
+    "builder": {
+        "daily_token_limit": -1,  # Unlimited
+        "per_conversation_cap": 1200,
+        "allocation": {
+            "jarvis": 0.45,
+            "celine": 0.25,
+            "optimus": 0.20,
+            "elonix": 0.10
+        }
+    },
+    "architect": {
+        "daily_token_limit": -1,  # Unlimited
+        "per_conversation_cap": 2000,
+        "allocation": {
+            "jarvis": 0.40,
+            "celine": 0.25,
+            "optimus": 0.20,
+            "elonix": 0.15
+        }
+    },
+    "awakener": {
+        "daily_token_limit": -1,  # Unlimited
+        "per_conversation_cap": 3000,
+        "allocation": {
+            "jarvis": 0.40,
+            "celine": 0.25,
+            "optimus": 0.20,
+            "elonix": 0.15
+        }
+    }
+}
+
+# Crisis mode configuration
+CRISIS_TOKEN_ALLOCATION = {
+    "tokens_per_query": 2000,
+    "allocation": {
+        "jarvis": 0.50,
+        "celine": 0.30,
+        "optimus": 0.20,
+        "elonix": 0.10
+    }
+}
+
+# Redis-based token tracking (production ready)
+# All token data now stored in Redis with automatic expiration
+
+def calculate_assistant_tokens(user_tier: str, assistant_name: str, total_tokens: int, crisis_mode: bool = False) -> int:
+    """Calculate token allocation for specific assistant based on tier and mode"""
+    if crisis_mode:
+        allocation = CRISIS_TOKEN_ALLOCATION["allocation"]
+        return int(total_tokens * allocation.get(assistant_name.lower(), 0))
     
-    # Check daily limit (if not unlimited)
-    if limits["daily_limit"] != -1:
-        daily_count = user_daily_counts[user_id][current_date]
-        if daily_count >= limits["daily_limit"]:
+    tier_config = TOKEN_LIMITS.get(user_tier, TOKEN_LIMITS["wanderer"])
+    
+    if user_tier == "wanderer":
+        allocation = tier_config["normal_allocation"]
+    else:
+        allocation = tier_config["allocation"]
+    
+    return int(total_tokens * allocation.get(assistant_name.lower(), 0))
+
+def check_token_limits(user_id: str, user_tier: str, estimated_tokens: int, crisis_mode: bool = False) -> Dict:
+    """Check if user has sufficient tokens for the request using Redis storage"""
+    # Crisis mode bypasses all limits
+    if crisis_mode:
+        return {"allowed": True, "mode": "crisis", "tokens_allocated": CRISIS_TOKEN_ALLOCATION["tokens_per_query"]}
+    
+    tier_config = TOKEN_LIMITS.get(user_tier, TOKEN_LIMITS["wanderer"])
+    
+    # Handle Wanderer tier with teaser mode
+    if user_tier == "wanderer":
+        teaser_config = tier_config["teaser_mode"]
+        
+        # Get teaser usage from Redis
+        teaser_data = get_teaser_usage(user_id)
+        
+        # Check if user is still in teaser mode
+        if teaser_data["queries_used"] < teaser_config["queries"]:
+            # Allow teaser query and update Redis
+            update_teaser_usage(user_id)
+            return {
+                "allowed": True, 
+                "mode": "teaser", 
+                "tokens_allocated": teaser_config["tokens_per_query"],
+                "teaser_queries_remaining": teaser_config["queries"] - teaser_data["queries_used"] - 1
+            }
+        
+        # Check daily limit for normal queries using Redis
+        daily_used = get_daily_token_usage(user_id)
+        if daily_used + estimated_tokens > tier_config["daily_token_limit"]:
             return {
                 "allowed": False,
-                "error": "Daily limit exceeded",
-                "limit_type": "daily",
-                "limit": limits["daily_limit"],
-                "reset_time": "tomorrow"
+                "error": "Daily token limit exceeded",
+                "daily_limit": tier_config["daily_token_limit"],
+                "daily_used": daily_used,
+                "remaining": max(0, tier_config["daily_token_limit"] - daily_used),
+                "upgrade_url": "https://www.firststepai.tech/pricing"
             }
+        
+        return {"allowed": True, "mode": "normal", "tokens_allocated": estimated_tokens}
     
-    # Record the request
-    user_requests[user_id].append(current_time)
-    user_daily_counts[user_id][current_date] += 1
+    # Handle paid tiers (Builder, Architect, Awakener)
+    else:
+        per_conversation_cap = tier_config["per_conversation_cap"]
+        
+        if estimated_tokens > per_conversation_cap:
+            return {
+                "allowed": False,
+                "error": "Per-conversation token limit exceeded",
+                "per_conversation_limit": per_conversation_cap,
+                "requested": estimated_tokens
+            }
+        
+        return {"allowed": True, "mode": "normal", "tokens_allocated": estimated_tokens}
+
+def update_token_usage(user_id: str, tokens_used: int, crisis_mode: bool = False):
+    """Update user's token usage in Redis"""
+    # Don't count crisis mode tokens against user limits
+    if crisis_mode:
+        return
     
-    return {"allowed": True}
+    # Update daily token usage in Redis
+    update_daily_token_usage(user_id, tokens_used)
 
 # Initialize all AI models
 jarvis_model = init_chat_model("gpt-4o", model_provider="openai", temperature=0.3)
@@ -400,19 +483,27 @@ async def chat():
         # Crisis detection for emergency override
         crisis_detected = detect_crisis(query)
         
-        # Rate limiting (skip for crisis situations)
+        # Estimate tokens for the query (rough estimation: 1 token ≈ 4 characters)
+        estimated_tokens = max(len(query) // 4, 50)  # Minimum 50 tokens
+        
+        # Token limiting (skip for crisis situations)
         if not crisis_detected:
-            rate_check = check_rate_limits(user_id, user_tier)
-            if not rate_check["allowed"]:
+            token_check = check_token_limits(user_id, user_tier, estimated_tokens, crisis_mode=False)
+            if not token_check["allowed"]:
                 return jsonify({
-                    "error": rate_check["error"],
-                    "limit_type": rate_check["limit_type"],
-                    "limit": rate_check["limit"],
-                    "reset_time": rate_check["reset_time"],
-                    "upgrade_url": "https://www.firststepai.tech/pticing",
+                    "error": token_check["error"],
+                    "daily_limit": token_check.get("daily_limit"),
+                    "daily_used": token_check.get("daily_used"),
+                    "remaining": token_check.get("remaining"),
+                    "per_conversation_limit": token_check.get("per_conversation_limit"),
+                    "requested": token_check.get("requested"),
+                    "upgrade_url": token_check.get("upgrade_url", "https://www.firststepai.tech/pricing"),
                     "current_tier": user_tier,
-                    "status": "rate_limited"
+                    "status": "token_limit_exceeded"
                 }), 429
+        else:
+            # Crisis mode token allocation
+            token_check = check_token_limits(user_id, user_tier, estimated_tokens, crisis_mode=True)
 
         # Use separate memory threads for each user
         config = {"configurable": {"thread_id": f"{user_id}_conversation"}}
@@ -438,12 +529,49 @@ async def chat():
         crisis_detected = output.get("crisis_detected", False)
         model_used = get_model_info(assistant_name)
 
-        # Store interaction data
+        # Calculate actual tokens used (rough estimation: 1 token ≈ 4 characters)
+        response_tokens = len(response) // 4
+        total_tokens = estimated_tokens + response_tokens
+        
+        # Get allocated tokens for this assistant
+        assistant_tokens = calculate_assistant_tokens(
+            user_tier, 
+            assistant_name, 
+            token_check["tokens_allocated"], 
+            crisis_detected
+        )
+        
+        # Update token usage (excluding crisis mode)
+        update_token_usage(user_id, total_tokens, crisis_detected)
+
+        # Track analytics in Redis
+        increment_metric("total_requests")
+        increment_metric(f"requests_by_assistant_{assistant_name.lower()}")
+        increment_metric(f"requests_by_tier_{user_tier}")
+        increment_metric(f"requests_by_category_{task_category}")
+        if crisis_detected:
+            increment_metric("crisis_requests")
+            increment_metric(f"crisis_by_tier_{user_tier}")
+
+        # Store conversation history in Redis
+        conversation_data = {
+            "query": query,
+            "response": response,
+            "assistant_name": assistant_name,
+            "tokens_used": total_tokens,
+            "crisis_detected": crisis_detected,
+            "user_tier": user_tier,
+            "task_category": task_category,
+            "model_used": model_used
+        }
+        store_conversation(user_id, conversation_data)
+
+        # Store interaction data in Supabase
         response_id = await store_data_supabase(
             assistant_name, model_used, response, query, user_id, task_category
         )
         
-        # Prepare response with FirstStepAI context
+        # Prepare response with FirstStepAI context and token information
         api_response = {
             "response": response,
             "assistant_name": assistant_name,
@@ -455,12 +583,25 @@ async def chat():
             "status_type": 200,
             "response_id": response_id,
             "soul_points_earned": 10 if not crisis_detected else 50,  # More points for crisis engagement
+            "token_info": {
+                "tokens_used": total_tokens,
+                "assistant_tokens": assistant_tokens,
+                "mode": token_check.get("mode", "normal"),
+                "tokens_allocated": token_check["tokens_allocated"]
+            },
             "firststep_ai": {
                 "mission": "Guiding 1M entrepreneurs to success",
                 "community": "FirstStepAI Entrepreneur Network",
                 "upgrade_available": user_tier != "awakener"
             }
         }
+        
+        # Add teaser mode information for wanderer users
+        if user_tier == "wanderer" and token_check.get("mode") == "teaser":
+            api_response["teaser_info"] = {
+                "teaser_queries_remaining": token_check.get("teaser_queries_remaining", 0),
+                "message": "You're in teaser mode! Enjoy these enhanced responses before upgrading."
+            }
         
         # Add crisis resources if detected
         if crisis_detected:
@@ -492,9 +633,13 @@ def get_model_info(assistant_name: str) -> str:
 
 @quart_app.route('/assistants', methods=['GET'])
 async def get_assistants():
-    """Get FirstStepAI AI Orchestra information with tier access"""
+    """Get FirstStepAI AI Orchestra information with tier access and token allocations"""
     user_tier = request.args.get('tier', 'wanderer')
     available_ais = get_available_ais(user_tier)
+    
+    # Get token allocation information for the tier
+    tier_config = TOKEN_LIMITS.get(user_tier, TOKEN_LIMITS["wanderer"])
+    allocation = tier_config.get("allocation") or tier_config.get("normal_allocation", {})
     
     assistants = {
         "jarvis": {
@@ -504,6 +649,7 @@ async def get_assistants():
             "specialization": "Entrepreneurial Strategy & Crisis Support",
             "available_tiers": ["wanderer", "builder", "architect", "awakener"],
             "accessible": "jarvis" in available_ais,
+            "token_allocation": allocation.get("jarvis", 0) * 100,  # Convert to percentage
             "capabilities": [
                 "Startup strategy and business planning",
                 "Crisis detection and emergency support", 
@@ -517,8 +663,9 @@ async def get_assistants():
             "role": "Creative Strategist & Communication",
             "model": "Claude-3.5-Sonnet",
             "specialization": "Brand Development & Investor Communication",
-            "available_tiers": ["builder", "architect", "awakener"],
+            "available_tiers": ["wanderer", "builder", "architect", "awakener"],
             "accessible": "celine" in available_ais,
+            "token_allocation": allocation.get("celine", 0) * 100,  # Convert to percentage
             "capabilities": [
                 "Investor pitch development",
                 "Brand storytelling and messaging",
@@ -532,8 +679,9 @@ async def get_assistants():
             "role": "Social Intelligence & Trends",
             "model": "XAI Grok-3",
             "specialization": "Viral Marketing & Market Intelligence",
-            "available_tiers": ["architect", "awakener"],
+            "available_tiers": ["wanderer", "builder", "architect", "awakener"],
             "accessible": "elonix" in available_ais,
+            "token_allocation": allocation.get("elonix", 0) * 100,  # Convert to percentage
             "capabilities": [
                 "Viral marketing and growth strategies",
                 "Real-time market intelligence",
@@ -547,8 +695,9 @@ async def get_assistants():
             "role": "Technical Architect & Automation",
             "model": "DeepSeek Reasoner", 
             "specialization": "Business Automation & Technical Infrastructure",
-            "available_tiers": ["awakener"],
+            "available_tiers": ["wanderer", "builder", "architect", "awakener"],
             "accessible": "optimus" in available_ais,
+            "token_allocation": allocation.get("optimus", 0) * 100,  # Convert to percentage
             "capabilities": [
                 "Business process automation",
                 "Technical infrastructure development",
@@ -559,20 +708,133 @@ async def get_assistants():
         }
     }
     
+    # Add tier-specific token information
+    token_info = {
+        "tier": user_tier,
+        "allocation_percentages": {k: v * 100 for k, v in allocation.items()},
+    }
+    
+    if user_tier == "wanderer":
+        token_info.update({
+            "daily_token_limit": tier_config["daily_token_limit"],
+            "teaser_mode": {
+                "queries": tier_config["teaser_mode"]["queries"],
+                "tokens_per_query": tier_config["teaser_mode"]["tokens_per_query"]
+            }
+        })
+    else:
+        token_info.update({
+            "per_conversation_cap": tier_config["per_conversation_cap"],
+            "daily_limit": "unlimited"
+        })
+    
     return jsonify({
         "firststepai_orchestra": assistants,
         "user_tier": user_tier,
         "available_ais": available_ais,
+        "token_info": token_info,
+        "crisis_mode": {
+            "tokens_per_query": CRISIS_TOKEN_ALLOCATION["tokens_per_query"],
+            "allocation": {k: v * 100 for k, v in CRISIS_TOKEN_ALLOCATION["allocation"].items()}
+        },
         "mission": "Guiding 1 million entrepreneurs from idea to sustainable success",
         "upgrade_url": "https://firststepai.com/upgrade" if user_tier != "awakener" else None,
         "status": "success"
     }), 200
 
+@quart_app.route('/tokens/usage', methods=['GET'])
+async def get_token_usage():
+    """Get user's current token usage and limits from Redis"""
+    user_id = request.args.get('user_id')
+    user_tier = request.args.get('tier', 'wanderer')
+    
+    if not user_id:
+        return jsonify({"error": "Missing required parameter: user_id", "status": "error"}), 400
+    
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    tier_config = TOKEN_LIMITS.get(user_tier, TOKEN_LIMITS["wanderer"])
+    
+    # Get daily usage from Redis
+    daily_used = get_daily_token_usage(user_id)
+    
+    usage_info = {
+        "user_id": user_id,
+        "user_tier": user_tier,
+        "date": current_date,
+        "daily_tokens_used": daily_used,
+    }
+    
+    if user_tier == "wanderer":
+        teaser_config = tier_config["teaser_mode"]
+        teaser_data = get_teaser_usage(user_id)
+        
+        usage_info.update({
+            "daily_token_limit": tier_config["daily_token_limit"],
+            "daily_tokens_remaining": max(0, tier_config["daily_token_limit"] - daily_used),
+            "teaser_queries_used": teaser_data["queries_used"],
+            "teaser_queries_remaining": max(0, teaser_config["queries"] - teaser_data["queries_used"]),
+            "teaser_tokens_per_query": teaser_config["tokens_per_query"],
+            "in_teaser_mode": teaser_data["queries_used"] < teaser_config["queries"]
+        })
+    else:
+        usage_info.update({
+            "daily_limit": "unlimited",
+            "per_conversation_cap": tier_config["per_conversation_cap"]
+        })
+    
+    return jsonify({
+        "usage": usage_info,
+        "redis_status": "connected" if redis_manager.is_connected() else "disconnected",
+        "status": "success"
+    }), 200
+
+@quart_app.route('/analytics', methods=['GET'])
+async def get_analytics():
+    """Get FirstStepAI analytics from Redis"""
+    date = request.args.get('date', datetime.now().strftime("%Y-%m-%d"))
+    
+    analytics = {
+        "date": date,
+        "total_requests": redis_manager.get_metric("total_requests", date),
+        "crisis_requests": redis_manager.get_metric("crisis_requests", date),
+        "by_assistant": {
+            "jarvis": redis_manager.get_metric("requests_by_assistant_jarvis", date),
+            "celine": redis_manager.get_metric("requests_by_assistant_celine", date),
+            "elonix": redis_manager.get_metric("requests_by_assistant_elonix", date),
+            "optimus": redis_manager.get_metric("requests_by_assistant_optimus", date),
+        },
+        "by_tier": {
+            "wanderer": redis_manager.get_metric("requests_by_tier_wanderer", date),
+            "builder": redis_manager.get_metric("requests_by_tier_builder", date),
+            "architect": redis_manager.get_metric("requests_by_tier_architect", date),
+            "awakener": redis_manager.get_metric("requests_by_tier_awakener", date),
+        },
+        "by_category": {
+            "business": redis_manager.get_metric("requests_by_category_business", date),
+            "technical": redis_manager.get_metric("requests_by_category_technical", date),
+            "creative": redis_manager.get_metric("requests_by_category_creative", date),
+            "social": redis_manager.get_metric("requests_by_category_social", date),
+        },
+        "redis_status": redis_health_check(),
+        "status": "success"
+    }
+    
+    return jsonify(analytics), 200
+
+@quart_app.route('/redis/health', methods=['GET'])
+async def redis_health():
+    """Redis health check endpoint"""
+    health = redis_health_check()
+    status_code = 200 if health["status"] == "healthy" else 503
+    return jsonify(health), status_code
+
 @quart_app.route('/health', methods=['GET'])
 async def health():
-    """Enhanced health check with FirstStepAI status"""
+    """Enhanced health check with FirstStepAI Redis-based system status"""
+    redis_health = redis_health_check()
+    
     return jsonify({
-        "status": "healthy",
+        "status": "healthy" if redis_health["status"] == "healthy" else "degraded",
         "service": "FirstStepAI - AI Orchestra for Entrepreneurs",
         "mission": "Guiding 1M entrepreneurs to success",
         "ai_orchestra": {
@@ -582,8 +844,38 @@ async def health():
             "optimus": "Technical Architect & Automation"
         },
         "models": ["GPT-4o", "Claude-3.5-Sonnet", "XAI Grok-3", "DeepSeek Reasoner"],
-        "version": "2.0.0",
-        "features": ["tier_validation", "crisis_detection", "rate_limiting", "soul_points"]
+        "version": "3.0.0",
+        "storage": "Redis Cloud Production",
+        "redis": {
+            "status": redis_health["status"],
+            "connected": redis_manager.is_connected(),
+            "version": redis_health.get("redis_version", "unknown")
+        },
+        "features": [
+            "redis_token_tracking", 
+            "persistent_storage",
+            "conversation_history",
+            "real_time_analytics",
+            "teaser_mode_wanderer", 
+            "crisis_detection", 
+            "tier_token_allocation", 
+            "soul_points",
+            "per_conversation_caps"
+        ],
+        "endpoints": {
+            "/chat": "AI conversation with token tracking",
+            "/tokens/usage": "User token usage from Redis",
+            "/analytics": "Real-time analytics from Redis",
+            "/redis/health": "Redis connection status",
+            "/assistants": "AI Orchestra information"
+        },
+        "tier_system": {
+            "wanderer": "1000 tokens/day + 3 teaser queries (1200 tokens each)",
+            "builder": "Unlimited conversations, 1200 tokens/conversation",
+            "architect": "Unlimited conversations, 2000 tokens/conversation", 
+            "awakener": "Unlimited conversations, 3000 tokens/conversation"
+        },
+        "crisis_mode": "2000 tokens/query, bypasses all limits"
     }), 200
 
 if __name__ == '__main__':

@@ -24,12 +24,12 @@ class classifier_query_data(BaseModel):
     crisis_detected: Optional[bool] = False
     tier_override: Optional[bool] = False
 
-# FirstStepAI Business Logic
+# FirstStepAI Business Logic - All tiers access all models with different token allocations
 TIER_ACCESS = {
-    "wanderer": ["jarvis"],                           # Free - Jarvis only
-    "builder": ["jarvis", "celine"],                  # $9 - Jarvis + Celine
-    "architect": ["jarvis", "celine", "elonix"],      # $29 - 3 AIs
-    "awakener": ["jarvis", "celine", "elonix", "optimus"]  # $99 - Full access
+    "wanderer": ["jarvis", "celine", "elonix", "optimus"],   # Free - All models available
+    "builder": ["jarvis", "celine", "elonix", "optimus"],    # $9 - All models available
+    "architect": ["jarvis", "celine", "elonix", "optimus"],  # $29 - All models available
+    "awakener": ["jarvis", "celine", "elonix", "optimus"]    # $99 - All models available
 }
 
 CRISIS_KEYWORDS = [
@@ -132,10 +132,12 @@ FIRSTSTEPAI AI ORCHESTRA:
    - Professional correspondence and emails
 
 TIER ACCESS CONTROL:
-- Wanderer (Free): Jarvis only - Basic entrepreneurial guidance
-- Builder ($9): Jarvis + Celine - Strategy + Creative communication
-- Architect ($29): Jarvis + Celine + Elonix - Full business intelligence
-- Awakener ($99): Complete AI Orchestra - Maximum entrepreneurial support
+- All tiers have access to all AI models (Jarvis, Celine, Elonix, Optimus)
+- Token allocation differs by tier:
+  * Wanderer (Free): Jarvis 55%, Optimus 30%, Celine 10%, Elonix 5%
+  * Builder ($9): Jarvis 45%, Celine 25%, Optimus 20%, Elonix 10%
+  * Architect ($29): Jarvis 40%, Celine 25%, Optimus 20%, Elonix 15%
+  * Awakener ($99): Jarvis 40%, Celine 25%, Optimus 20%, Elonix 15%
 
 CRISIS DETECTION KEYWORDS: {CRISIS_KEYWORDS}
 - Crisis situations automatically unlock full AI access
@@ -146,7 +148,8 @@ ORCHESTRATION RULES:
 - Simple queries → Single AI response
 - Complex entrepreneurial challenges → Multi-AI collaboration
 - Crisis situations → Immediate Jarvis response with escalation
-- Tier restrictions → Enforce unless crisis detected
+- All tiers can access all models with different token allocations
+- Route to optimal AI based on query type and user preferences
 
 CLASSIFICATION GUIDELINES:
 - Focus on entrepreneurial context and business building
