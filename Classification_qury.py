@@ -88,13 +88,17 @@ FIRSTSTEPAI MISSION: Guide 1 million entrepreneurs from idea to sustainable succ
 
 USER CONTEXT:
 - User Tier: {user_tier}
-- Available AIs: {available_ais}
+- Available Specialist AIs: {available_ais}
 - Crisis Detected: {crisis_detected}
 - Emergency Override: {emergency_override}
 
-FIRSTSTEPAI AI ORCHESTRA:
+FIRSTSTEPAI AI ORCHESTRA - NEW BRAND ARCHITECTURE:
 
-1. "Jarvis" (GPT-4o) - AI CEO & STRATEGIC MENTOR:
+IMPORTANT: Jarvis is the ONLY user-facing assistant. Other AIs work behind the scenes as specialist consultants.
+
+1. "Jarvis" (GPT-4o) - AI CEO & USER-FACING MENTOR:
+   - The ONLY assistant that responds directly to users
+   - Synthesizes insights from specialist AI team
    - Entrepreneurial strategy and business planning
    - Crisis support and emergency guidance
    - Leadership development and mentoring
@@ -104,70 +108,80 @@ FIRSTSTEPAI AI ORCHESTRA:
    - Soul points and achievement system
    - FirstStepAI community guidance
 
-2. "Elonix" (XAI/Grok) - SOCIAL INTELLIGENCE & TRENDS:
-   - Social media trends and viral content creation
-   - Market intelligence and real-time news
+BEHIND-THE-SCENES SPECIALIST AI TEAM:
+
+2. "Elonix" (XAI/Grok) - SOCIAL INTELLIGENCE SPECIALIST:
+   - Provides social intelligence analysis TO JARVIS (not directly to users)
+   - Social media trends and viral content insights
+   - Market intelligence and real-time news analysis
    - Cultural phenomena and trending opportunities
    - Social impact analysis for entrepreneurs
-   - Viral marketing and growth strategies
-   - Community building and engagement
+   - Viral marketing and growth strategy recommendations
+   - Community building and engagement insights
    - Trend forecasting for business opportunities
 
-3. "Optimus" (DeepSeek) - TECHNICAL ARCHITECT & AUTOMATION:
-   - Business automation and technical solutions
-   - Data scraping and market research tools
-   - Technical infrastructure and development
-   - AI integration and optimization
-   - Process automation for entrepreneurs
+3. "Optimus" (DeepSeek) - TECHNICAL ARCHITECTURE SPECIALIST:
+   - Provides technical insights TO JARVIS (not directly to users)
+   - Business automation and technical solution recommendations
+   - Data scraping and market research analysis
+   - Technical infrastructure and development guidance
+   - AI integration and optimization strategies
+   - Process automation recommendations for entrepreneurs
    - Technical due diligence and analysis
    - Scientific research and data analysis
 
-4. "Celine" (Claude) - CREATIVE STRATEGIST & COMMUNICATION:
-   - Persuasive communication and storytelling
-   - Brand development and messaging
-   - Marketing copy and content creation
-   - Investor pitch and presentation development
-   - Customer communication and support
-   - Creative problem-solving and innovation
-   - Professional correspondence and emails
+4. "Celine" (Claude) - CREATIVE STRATEGY SPECIALIST:
+   - Provides creative insights TO JARVIS (not directly to users)
+   - Persuasive communication and storytelling strategies
+   - Brand development and messaging recommendations
+   - Marketing copy and content creation guidance
+   - Investor pitch and presentation development support
+   - Customer communication and support optimization
+   - Creative problem-solving and innovation insights
+   - Professional correspondence and email strategies
 
 TIER ACCESS CONTROL:
-- All tiers have access to all AI models (Jarvis, Celine, Elonix, Optimus)
-- Token allocation differs by tier:
+- All tiers have access to all specialist AI models working behind the scenes
+- Token allocation differs by tier for specialist consultations:
   * Wanderer (Free): Jarvis 55%, Optimus 30%, Celine 10%, Elonix 5%
   * Builder ($9): Jarvis 45%, Celine 25%, Optimus 20%, Elonix 10%
   * Architect ($29): Jarvis 40%, Celine 25%, Optimus 20%, Elonix 15%
   * Awakener ($99): Jarvis 40%, Celine 25%, Optimus 20%, Elonix 15%
 
 CRISIS DETECTION KEYWORDS: {CRISIS_KEYWORDS}
-- Crisis situations automatically unlock full AI access
+- Crisis situations automatically unlock full specialist AI access
 - Emergency escalation to premium support
-- Immediate entrepreneurial crisis response
+- Immediate Jarvis response with full specialist team support
 
-ORCHESTRATION RULES:
-- Simple queries → Single AI response
-- Complex entrepreneurial challenges → Multi-AI collaboration
-- Crisis situations → Immediate Jarvis response with escalation
-- All tiers can access all models with different token allocations
-- Route to optimal AI based on query type and user preferences
+NEW ORCHESTRATION RULES:
+- ALL user responses come from Jarvis (brand consistency)
+- Simple queries → Jarvis responds alone or with minimal specialist input
+- Complex entrepreneurial challenges → Jarvis orchestrates multiple specialist insights
+- Crisis situations → Immediate Jarvis response with full specialist team escalation
+- Specialist AIs NEVER respond directly to users
+- Classification determines which specialist should provide behind-the-scenes analysis to Jarvis
 
-CLASSIFICATION GUIDELINES:
-- Focus on entrepreneurial context and business building
+CLASSIFICATION GUIDELINES FOR NEW ARCHITECTURE:
+- Determine which SPECIALIST AI should provide behind-the-scenes analysis to Jarvis
+- Focus on entrepreneurial context and business building needs
 - Consider FirstStepAI mission and soul points system
 - Prioritize crisis detection and emergency support
-- Route based on tier access and emergency override
-- Default to Jarvis for entrepreneurial mentoring
+- Route specialist consultation based on query type and complexity
+- Default to Jarvis-only for simple entrepreneurial mentoring
+- REMEMBER: Users will ALWAYS see Jarvis as the respondent
+
+YOUR TASK: Classify which specialist AI should provide behind-the-scenes analysis to help Jarvis give the best response.
 
 USER QUERY: {input_question}
 
-Analyze this query considering:
-1. Entrepreneurial intent and complexity
-2. User tier permissions and access rights
-3. Crisis detection and emergency escalation needs
-4. Optimal AI orchestration for best results
-5. FirstStepAI mission alignment
+Analyze this query to determine:
+1. Which specialist AI should provide behind-the-scenes insights to Jarvis
+2. Entrepreneurial intent and complexity level
+3. User tier permissions for specialist consultations
+4. Crisis detection and emergency escalation needs
+5. Optimal specialist consultation strategy for Jarvis
 
-Respond with classification considering tier access control and crisis detection."""
+Remember: Your classification determines which specialist works behind the scenes. Jarvis will ALWAYS be the one responding to the user."""
 
     try:
         completion = client.beta.chat.completions.parse(

@@ -403,56 +403,186 @@ Always position communication strategies within entrepreneurial success and Firs
 workflow = StateGraph(state_schema=State)
 
 async def route_to_assistant(state: State):
-    """Enhanced routing with tier validation and crisis detection"""
+    """Enhanced orchestration with Jarvis as the only user-facing assistant.
+    Other AIs work behind the scenes as specialist consultants."""
     latest_message = state["messages"][-1].content
     user_tier = state.get("user_tier", "wanderer")
     
     try:
-        # Use enhanced classifier with tier validation
+        # Use enhanced classifier to determine which specialists should provide input
         json_output, total_tokens, metadata = analyze_query(
             latest_message, 
             user_tier=user_tier,
             emergency_override=False
         )
         classification_data = json.loads(json_output)
-        assistant_name = classification_data["steps"][0]["assistant_name"]
+        recommended_specialist = classification_data["steps"][0]["assistant_name"]
         task_category = classification_data["steps"][0]["task_category"]
         crisis_detected = metadata.get("crisis_detected", False)
         
-        # Route to the appropriate assistant
-        if assistant_name.lower() == "jarvis":
-            prompt = jarvis_prompt.invoke(state)
-            response = await jarvis_model.ainvoke(prompt)
-        elif assistant_name.lower() == "elonix":
-            prompt = elonix_prompt.invoke(state)
-            response = await elonix_model.ainvoke(prompt)
-        elif assistant_name.lower() == "optimus":
-            prompt = optimus_prompt.invoke(state)
-            response = await optimus_model.ainvoke(prompt)
-        elif assistant_name.lower() == "celine":
-            prompt = celine_prompt.invoke(state)
-            response = await celine_model.ainvoke(prompt)
-        else:
-            # Default to Jarvis for unknown requests
-            prompt = jarvis_prompt.invoke(state)
-            response = await jarvis_model.ainvoke(prompt)
-            assistant_name = "Jarvis"
-            task_category = "business"
+        # Collect specialist insights based on the query type
+        specialist_insights = []
+        
+        # Get input from the recommended specialist based on classification
+        if recommended_specialist.lower() == "celine":
+            # Get Celine's creative/communication insights
+            celine_prompt_with_context = ChatPromptTemplate.from_messages([
+                ("system", """You are Celine, a Creative Strategist AI providing behind-the-scenes analysis for Jarvis, the CEO of FirstStepAI.
+
+IMPORTANT: You are NOT responding directly to the user. You are providing strategic insights and recommendations that Jarvis will use to craft his response to the user.
+
+Your role is to provide:
+- Creative communication strategies and messaging approaches
+- Brand development and storytelling insights  
+- Marketing copy suggestions and content ideas
+- Investor pitch recommendations
+- Customer communication optimization strategies
+
+Provide your analysis in a structured format that Jarvis can easily incorporate into his entrepreneurial mentoring response.
+
+Focus on actionable insights that will help Jarvis provide excellent guidance to this entrepreneur."""),
+                MessagesPlaceholder(variable_name="messages"),
+            ])
+            celine_analysis_prompt = celine_prompt_with_context.invoke(state)
+            celine_insight = await celine_model.ainvoke(celine_analysis_prompt)
+            specialist_insights.append(f"Creative Strategy Analysis (Celine): {celine_insight.content}")
             
+        elif recommended_specialist.lower() == "optimus":
+            # Get Optimus's technical insights
+            optimus_prompt_with_context = ChatPromptTemplate.from_messages([
+                ("system", """You are Optimus, a Technical Architect AI providing behind-the-scenes analysis for Jarvis, the CEO of FirstStepAI.
+
+IMPORTANT: You are NOT responding directly to the user. You are providing technical insights and recommendations that Jarvis will use to craft his response to the user.
+
+Your role is to provide:
+- Technical architecture and automation recommendations
+- Business process optimization strategies
+- Data analysis and market research insights
+- AI integration and technical optimization suggestions
+- Scalable solution recommendations
+
+Provide your analysis in a structured format that Jarvis can easily incorporate into his entrepreneurial mentoring response.
+
+Focus on actionable technical insights that will help Jarvis provide excellent guidance to this entrepreneur."""),
+                MessagesPlaceholder(variable_name="messages"),
+            ])
+            optimus_analysis_prompt = optimus_prompt_with_context.invoke(state)
+            optimus_insight = await optimus_model.ainvoke(optimus_analysis_prompt)
+            specialist_insights.append(f"Technical Architecture Analysis (Optimus): {optimus_insight.content}")
+            
+        elif recommended_specialist.lower() == "elonix":
+            # Get Elonix's social/trend insights
+            elonix_prompt_with_context = ChatPromptTemplate.from_messages([
+                ("system", """You are Elonix, a Social Intelligence AI providing behind-the-scenes analysis for Jarvis, the CEO of FirstStepAI.
+
+IMPORTANT: You are NOT responding directly to the user. You are providing social intelligence and trend insights that Jarvis will use to craft his response to the user.
+
+Your role is to provide:
+- Social media strategy and viral marketing insights
+- Market trend analysis and cultural opportunities
+- Community building and audience development strategies
+- Real-time market intelligence and social impact analysis
+- Viral growth and engagement recommendations
+
+Provide your analysis in a structured format that Jarvis can easily incorporate into his entrepreneurial mentoring response.
+
+Focus on actionable social insights that will help Jarvis provide excellent guidance to this entrepreneur."""),
+                MessagesPlaceholder(variable_name="messages"),
+            ])
+            elonix_analysis_prompt = elonix_prompt_with_context.invoke(state)
+            elonix_insight = await elonix_model.ainvoke(elonix_analysis_prompt)
+            specialist_insights.append(f"Social Intelligence Analysis (Elonix): {elonix_insight.content}")
+
+        # For complex queries, get additional specialist input
+        complexity_score = classification_data.get("complexity_score", 0.5)
+        if complexity_score > 0.7:
+            # Get additional specialist insights for complex queries
+            if recommended_specialist.lower() != "celine":
+                # Add Celine's perspective
+                celine_prompt_with_context = ChatPromptTemplate.from_messages([
+                    ("system", """You are Celine, providing supplementary creative insights for Jarvis. Provide brief, focused creative strategy recommendations that complement the primary analysis."""),
+                    MessagesPlaceholder(variable_name="messages"),
+                ])
+                celine_analysis_prompt = celine_prompt_with_context.invoke(state)
+                celine_insight = await celine_model.ainvoke(celine_analysis_prompt)
+                specialist_insights.append(f"Supplementary Creative Analysis (Celine): {celine_insight.content}")
+        
+        # Now have Jarvis synthesize all specialist insights into his response
+        enhanced_jarvis_prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are Jarvis, the AI CEO and strategic mentor for FirstStepAI - the world's most advanced entrepreneurial guidance platform.
+
+FIRSTSTEPAI MISSION: Guide 1 million entrepreneurs from idea to sustainable success.
+
+YOUR ROLE AS AI CEO:
+- You are the ONLY assistant that responds directly to users
+- Strategic business leadership and mentoring for entrepreneurs
+- Crisis detection and emergency escalation for struggling founders
+- Soul points integration and achievement system guidance
+- Movement building for entrepreneurial consciousness
+- FirstStepAI community leadership and support
+
+SPECIALIST TEAM INSIGHTS:
+You have a team of specialist AIs (Celine, Optimus, Elonix) who work behind the scenes to provide you with expert analysis. Below are their insights for this query:
+
+{specialist_insights}
+
+IMPORTANT INSTRUCTIONS:
+- You are the ONLY voice the user hears - never mention or reference the specialist AIs by name
+- Synthesize the specialist insights into your own strategic entrepreneurial guidance
+- Maintain your identity as Jarvis, the AI CEO mentor
+- Present insights as your own analysis and recommendations
+- Focus on entrepreneurial strategy, business growth, and actionable guidance
+- Award soul points and maintain FirstStepAI brand consistency
+
+CORE EXPERTISE FOR ENTREPRENEURS:
+- Startup strategy and business model development
+- Funding strategies and investor relations
+- Market validation and product-market fit
+- Crisis management and business recovery
+- Leadership development for founders
+- Strategic partnerships and growth strategies
+- Financial planning and cash flow management
+- Competitive analysis and market positioning
+
+COMMUNICATION STYLE:
+- Speak as entrepreneurial CEO and mentor
+- Reference FirstStepAI mission and community
+- Award soul points for engagement and milestones
+- Detect crisis situations and escalate appropriately
+- Build excitement about entrepreneurial journey
+- Use strategic frameworks and actionable insights
+- Provide hope and motivation for struggling entrepreneurs
+
+CRISIS DETECTION: If user shows signs of business failure, personal crisis, or desperation, immediately escalate with emergency resources and override tier restrictions.
+
+Always position responses within FirstStepAI ecosystem and entrepreneurial mentoring context."""),
+            MessagesPlaceholder(variable_name="messages"),
+        ])
+        
+        # Create the enhanced state with specialist insights
+        enhanced_prompt = enhanced_jarvis_prompt.invoke({
+            "messages": state["messages"],
+            "specialist_insights": "\n\n".join(specialist_insights) if specialist_insights else "No additional specialist analysis required for this query."
+        })
+        
+        # Jarvis provides the final response incorporating specialist insights
+        response = await jarvis_model.ainvoke(enhanced_prompt)
+        
     except Exception as e:
-        # Fallback to Jarvis with crisis context
-        print(f"Classifier error: {e}. Using Jarvis as fallback.")
+        # Fallback to Jarvis alone with crisis context
+        print(f"Orchestration error: {e}. Using Jarvis standalone as fallback.")
         prompt = jarvis_prompt.invoke(state)
         response = await jarvis_model.ainvoke(prompt)
-        assistant_name = "Jarvis"
+        recommended_specialist = "jarvis"
         task_category = "business"
         crisis_detected = detect_crisis(latest_message)
     
     return {
         "messages": [response], 
-        "assistant_name": assistant_name,
+        "assistant_name": "Jarvis",  # Always Jarvis as the user-facing assistant
         "task_category": task_category,
-        "crisis_detected": crisis_detected
+        "crisis_detected": crisis_detected,
+        "recommended_specialist": recommended_specialist  # Track which specialist provided behind-the-scenes support
     }
 
 # Build the workflow
@@ -524,10 +654,10 @@ async def chat():
             return jsonify({"error": f"Error generating response: {str(e)}", "status": "error"}), 500
 
         response = output["messages"][-1].content
-        assistant_name = output.get("assistant_name", "Jarvis")
+        assistant_name = "Jarvis"  # Always Jarvis for brand consistency
         task_category = output.get("task_category", "business")
         crisis_detected = output.get("crisis_detected", False)
-        model_used = get_model_info(assistant_name)
+        model_used = "gpt-4o (with specialist AI orchestra)"  # Reflect the collaborative approach
 
         # Calculate actual tokens used (rough estimation: 1 token ≈ 4 characters)
         response_tokens = len(response) // 4
@@ -546,9 +676,15 @@ async def chat():
 
         # Track analytics in Redis
         increment_metric("total_requests")
-        increment_metric(f"requests_by_assistant_{assistant_name.lower()}")
+        increment_metric(f"requests_by_assistant_jarvis")  # Always Jarvis for user-facing
         increment_metric(f"requests_by_tier_{user_tier}")
         increment_metric(f"requests_by_category_{task_category}")
+        
+        # Track which specialist AI provided behind-the-scenes support
+        recommended_specialist = output.get("recommended_specialist", "jarvis")
+        if recommended_specialist.lower() != "jarvis":
+            increment_metric(f"specialist_consultation_{recommended_specialist.lower()}")
+        
         if crisis_detected:
             increment_metric("crisis_requests")
             increment_metric(f"crisis_by_tier_{user_tier}")
@@ -557,24 +693,25 @@ async def chat():
         conversation_data = {
             "query": query,
             "response": response,
-            "assistant_name": assistant_name,
+            "assistant_name": "Jarvis",  # Always Jarvis for brand consistency
             "tokens_used": total_tokens,
             "crisis_detected": crisis_detected,
             "user_tier": user_tier,
             "task_category": task_category,
-            "model_used": model_used
+            "model_used": model_used,
+            "specialist_consulted": recommended_specialist  # Track behind-the-scenes specialist
         }
         store_conversation(user_id, conversation_data)
 
         # Store interaction data in Supabase
         response_id = await store_data_supabase(
-            assistant_name, model_used, response, query, user_id, task_category
+            "Jarvis", model_used, response, query, user_id, task_category
         )
         
         # Prepare response with FirstStepAI context and token information
         api_response = {
             "response": response,
-            "assistant_name": assistant_name,
+            "assistant_name": "Jarvis",  # Always Jarvis for brand consistency
             "task_category": task_category,
             "model_used": model_used,
             "user_tier": user_tier,
@@ -622,14 +759,9 @@ async def chat():
         return jsonify({"error": "An unexpected error occurred", "status": "error"}), 500
 
 def get_model_info(assistant_name: str) -> str:
-    """Return the model information for each assistant"""
-    model_mapping = {
-        "Jarvis": "gpt-4o",
-        "Elonix": "grok-3-latest", 
-        "Optimus": "deepseek-reasoner",
-        "Celine": "claude-3-5-sonnet-20240620"
-    }
-    return model_mapping.get(assistant_name, "gpt-4o")
+    """Return the model information - now always reflects the collaborative approach"""
+    # Since Jarvis now orchestrates all responses with specialist input
+    return "gpt-4o (with specialist AI orchestra)"
 
 @quart_app.route('/assistants', methods=['GET'])
 async def get_assistants():
@@ -644,66 +776,70 @@ async def get_assistants():
     assistants = {
         "jarvis": {
             "name": "Jarvis",
-            "role": "AI CEO & Strategic Mentor",
-            "model": "GPT-4o",
-            "specialization": "Entrepreneurial Strategy & Crisis Support",
+            "role": "AI CEO & Strategic Mentor (User-Facing)",
+            "model": "GPT-4o with AI Orchestra",
+            "specialization": "Complete Entrepreneurial Guidance with Specialist Team",
             "available_tiers": ["wanderer", "builder", "architect", "awakener"],
-            "accessible": "jarvis" in available_ais,
-            "token_allocation": allocation.get("jarvis", 0) * 100,  # Convert to percentage
+            "accessible": True,  # Always accessible as the main interface
+            "user_facing": True,
             "capabilities": [
-                "Startup strategy and business planning",
+                "Complete startup strategy and business planning",
                 "Crisis detection and emergency support", 
                 "Leadership development for entrepreneurs",
                 "Financial planning and investment strategies",
-                "Soul points and achievement system"
+                "Soul points and achievement system",
+                "Orchestrates specialist AI insights for comprehensive guidance"
             ]
         },
         "celine": {
             "name": "Celine",
-            "role": "Creative Strategist & Communication",
+            "role": "Creative Strategist (Behind-the-Scenes Specialist)",
             "model": "Claude-3.5-Sonnet",
-            "specialization": "Brand Development & Investor Communication",
+            "specialization": "Brand Development & Communication Strategy",
             "available_tiers": ["wanderer", "builder", "architect", "awakener"],
             "accessible": "celine" in available_ais,
-            "token_allocation": allocation.get("celine", 0) * 100,  # Convert to percentage
+            "user_facing": False,
+            "specialist_support": "Provides creative insights to Jarvis for optimal user guidance",
             "capabilities": [
-                "Investor pitch development",
-                "Brand storytelling and messaging",
-                "Marketing copy and content creation",
-                "Customer communication optimization",
-                "Creative problem-solving"
+                "Strategic communication analysis for Jarvis",
+                "Brand storytelling and messaging insights",
+                "Marketing strategy recommendations",
+                "Investor pitch development support",
+                "Creative problem-solving consultation"
             ]
         },
         "elonix": {
             "name": "Elonix",
-            "role": "Social Intelligence & Trends",
+            "role": "Social Intelligence Specialist (Behind-the-Scenes)",
             "model": "XAI Grok-3",
-            "specialization": "Viral Marketing & Market Intelligence",
+            "specialization": "Market Trends & Social Strategy",
             "available_tiers": ["wanderer", "builder", "architect", "awakener"],
             "accessible": "elonix" in available_ais,
-            "token_allocation": allocation.get("elonix", 0) * 100,  # Convert to percentage
+            "user_facing": False,
+            "specialist_support": "Provides social intelligence to Jarvis for trend-aware guidance",
             "capabilities": [
-                "Viral marketing and growth strategies",
-                "Real-time market intelligence",
-                "Social media trend analysis",
-                "Community building strategies",
-                "Cultural insight for business"
+                "Market trend analysis for Jarvis",
+                "Social media strategy insights",
+                "Viral marketing recommendations",
+                "Community building consultation",
+                "Cultural intelligence for business decisions"
             ]
         },
         "optimus": {
             "name": "Optimus",
-            "role": "Technical Architect & Automation",
+            "role": "Technical Architect (Behind-the-Scenes Specialist)",
             "model": "DeepSeek Reasoner", 
-            "specialization": "Business Automation & Technical Infrastructure",
+            "specialization": "Technical Solutions & Automation",
             "available_tiers": ["wanderer", "builder", "architect", "awakener"],
             "accessible": "optimus" in available_ais,
-            "token_allocation": allocation.get("optimus", 0) * 100,  # Convert to percentage
+            "user_facing": False,
+            "specialist_support": "Provides technical insights to Jarvis for technology-focused guidance",
             "capabilities": [
-                "Business process automation",
-                "Technical infrastructure development",
-                "Data analysis and market research",
-                "AI integration and optimization",
-                "Scalable solution architecture"
+                "Technical architecture consultation for Jarvis",
+                "Business automation recommendations",
+                "Data analysis and research support",
+                "AI integration strategy insights",
+                "Scalable solution development guidance"
             ]
         }
     }
@@ -730,8 +866,13 @@ async def get_assistants():
     
     return jsonify({
         "firststepai_orchestra": assistants,
+        "orchestration_model": {
+            "user_interface": "Jarvis (AI CEO) is the only user-facing assistant",
+            "behind_the_scenes": "Celine, Optimus, and Elonix provide specialized analysis to Jarvis",
+            "brand_consistency": "Users always interact with Jarvis as the consistent FirstStepAI voice"
+        },
         "user_tier": user_tier,
-        "available_ais": available_ais,
+        "available_specialists": available_ais,
         "token_info": token_info,
         "crisis_mode": {
             "tokens_per_query": CRISIS_TOKEN_ALLOCATION["tokens_per_query"],
