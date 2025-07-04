@@ -30,7 +30,7 @@ class RedisManager:
             )
             # Test connection
             self.redis_client.ping()
-            print("✅ Redis connection established successfully")
+            # print("✅ Redis connection established successfully")
         except redis.ConnectionError as e:
             print(f"❌ Redis connection failed: {e}")
             self.redis_client = None
