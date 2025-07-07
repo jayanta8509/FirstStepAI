@@ -4,13 +4,14 @@
 
 FirstStepAI is the world's most advanced entrepreneurial guidance platform, featuring an intelligent AI Orchestra with **Jarvis as your consistent CEO mentor** backed by specialist AIs working behind the scenes. Now powered by **Redis Cloud for enterprise-grade performance**.
 
-## 🌟 **The FirstStepAI AI Orchestra - Brand Architecture**
+## 🌟 **The FirstStepAI AI Orchestra - Tier-Based Dynamic Prompts**
 
-### 🎭 **Brand-Consistent User Experience**
+### 🎭 **Brand-Consistent User Experience with Adaptive Personalities**
 ✅ **Jarvis is the ONLY user-facing mentor** - Your consistent AI CEO  
-✅ **Celine, Optimus, and Elonix work behind the scenes** as specialist consultants  
+✅ **Tier-Based Prompt System** - All AIs adapt their personalities and capabilities based on subscription tier  
+✅ **Celine, Optimus, and Elonix work behind the scenes** as specialist consultants with tier-specific expertise  
 ✅ **Users never see responses from specialist AIs** - Brand consistency maintained  
-✅ **Seamless orchestration** - Jarvis synthesizes specialist insights for optimal guidance
+✅ **Seamless orchestration** - Jarvis synthesizes specialist insights with tier-appropriate depth
 
 ### 🤖 Jarvis - AI CEO & Strategic Mentor (USER-FACING)
 **"Your Consistent Entrepreneurial Commander-in-Chief"**
@@ -18,6 +19,12 @@ FirstStepAI is the world's most advanced entrepreneurial guidance platform, feat
 - ✅ **Available to**: All tiers (Wanderer, Builder, Architect, Awakener)
 - ✅ **Model**: GPT-4o with Specialist AI Orchestra
 - 🎯 **Specialization**: Complete Entrepreneurial Guidance with Expert Team Support
+
+**Tier-Based Personalities:**
+- **Wanderer**: Strategic orchestrator - "build systematically, not randomly" energy with 1-3 foundational insights
+- **Builder**: Elite orchestrator - "orchestrate systems for exponential growth" with 3-7 comprehensive strategies  
+- **Architect**: Strategic mastermind - "architect strategic mastery" with 5-10 proprietary methodologies
+- **Awakener**: Strategic ecosystem legend - "orchestrate movements" with 7-15 comprehensive transformation strategies
 
 **Core Capabilities:**
 - **Primary Interface**: The single, consistent voice of FirstStepAI
@@ -35,6 +42,12 @@ FirstStepAI is the world's most advanced entrepreneurial guidance platform, feat
 - ✅ **Model**: Claude-3.5-Sonnet
 - 🎯 **Specialization**: Creative Strategy & Communication Analysis for Jarvis
 
+**Tier-Based Strategic Personalities:**
+- **Wanderer**: Strategic orchestrator - "build systematically, not randomly" with foundational strategic insights and basic execution planning
+- **Builder**: Elite strategic orchestrator - "orchestrate systems for exponential growth" with advanced business architecture and multi-functional coordination
+- **Architect**: Strategic mastery mastermind - "architect strategic mastery" with custom frameworks and visionary leadership development
+- **Awakener**: Strategic ecosystem legend - "orchestrate movements" with global movement architecture and strategic ecosystem transformation
+
 **Specialist Capabilities:**
 - **Strategic Communication Analysis**: Provides creative insights to Jarvis
 - **Brand Development Support**: Messaging and storytelling recommendations
@@ -49,6 +62,12 @@ FirstStepAI is the world's most advanced entrepreneurial guidance platform, feat
 - ✅ **Available to**: All tiers (Wanderer, Builder, Architect, Awakener)
 - ✅ **Model**: XAI Grok-3
 - 🎯 **Specialization**: Social Intelligence & Trend Analysis for Jarvis
+
+**Tier-Based Intel Punk Personalities:**
+- **Wanderer**: Edgy intel punk - "catch the wave before it breaks" with trend spotting and basic timing analysis
+- **Builder**: Advanced intel punk - "dominate while they're still sleeping" with market penetration strategies and competitive intelligence
+- **Architect**: Market orchestration mastermind - "orchestrate while they're still playing checkers" with ecosystem intelligence and industry transformation
+- **Awakener**: Intel punk legend - "awaken while they're still sleeping" with global movement architecture and consciousness awakening systems
 
 **Specialist Capabilities:**
 - **Market Trend Analysis**: Real-time intelligence and cultural insights for Jarvis
@@ -65,6 +84,12 @@ FirstStepAI is the world's most advanced entrepreneurial guidance platform, feat
 - ✅ **Model**: DeepSeek Reasoner
 - 🎯 **Specialization**: Technical Architecture & Automation Analysis for Jarvis
 
+**Tier-Based Analytical Personalities:**
+- **Wanderer**: Analytical co-founder - "make decisions based on evidence, not emotions" with problem analysis and basic analytics
+- **Builder**: Elite analytical partner - "optimize based on predictive intelligence, not guesswork" with advanced statistical modeling and business intelligence automation
+- **Architect**: Business intelligence mastermind - "architect intelligence systems while they're still guessing" with organizational analytics and custom analytical frameworks
+- **Awakener**: AI consciousness orchestrator - "orchestrate consciousness while they're still calculating" with AI orchestration and autonomous intelligence systems
+
 **Specialist Capabilities:**
 - **Technical Architecture Consultation**: Infrastructure recommendations for Jarvis
 - **Business Automation Analysis**: Process optimization strategies
@@ -72,6 +97,32 @@ FirstStepAI is the world's most advanced entrepreneurial guidance platform, feat
 - **AI Integration Consultation**: Technical optimization recommendations
 - **Scalability Analysis**: Technical due diligence and development guidance
 - **System Design Support**: Database and automation strategy for Jarvis
+
+## 🎭 **Tier-Based Dynamic Prompt System**
+
+### **Revolutionary Adaptive AI Personalities**
+FirstStepAI features the world's first **Tier-Based Dynamic Prompt System** where all four AI assistants adapt their personalities, capabilities, and response depth based on your subscription tier:
+
+**🧠 How It Works:**
+```python
+# Dynamic prompt selection based on user tier
+jarvis_system_prompt = jarvis_tier_prompt(user_tier)
+celine_system_prompt = celine_tier_prompt(user_tier)  
+elonix_system_prompt = elonix_tier_prompt(user_tier)
+optimus_system_prompt = optimus_tier_prompt(user_tier)
+```
+
+**🎯 Progressive Sophistication:**
+- **Wanderer**: Foundation-building personalities with essential guidance
+- **Builder**: Advanced strategic personalities with comprehensive frameworks  
+- **Architect**: Mastery-level personalities with proprietary methodologies
+- **Awakener**: Visionary leadership personalities with global transformation focus
+
+**💫 Benefits:**
+✅ **Consistent Growth Path**: AI personalities evolve with your entrepreneurial journey  
+✅ **Natural Progression**: Seamless upgrade experience with deeper capabilities  
+✅ **Value Alignment**: Prompt sophistication matches subscription investment  
+✅ **Personalized Experience**: Each tier feels like a distinct but connected journey
 
 ## 💎 **Token-Based System & Subscription Tiers**
 
@@ -210,6 +261,12 @@ cd ai-orchestra
 pip install -r requirements.txt
 ```
 
+**Key Files in the Repository:**
+- `app.py` - Main application with tier-based prompt integration
+- `prompt.py` - Dynamic prompt system for all four AI assistants
+- `firststep_redis.py` - Enterprise Redis Cloud integration
+- `Classification_qury.py` - Intelligent query routing system
+
 ### 2. **Environment Setup**
 Create a `.env` file with your API keys:
 ```env
@@ -253,6 +310,7 @@ Server will start at `http://localhost:8999`
 
 ### 5. **Test Your Setup**
 ```bash
+# Test Wanderer tier (foundation-building personality)
 curl -X POST http://localhost:8999/chat \
   -H "Content-Type: application/json" \
   -d '{
@@ -260,7 +318,20 @@ curl -X POST http://localhost:8999/chat \
     "user_id": "entrepreneur_123",
     "user_tier": "wanderer"
   }'
+
+# Test Architect tier (mastery-level personality) 
+curl -X POST http://localhost:8999/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "Help me create a business plan for my startup",
+    "user_id": "entrepreneur_123", 
+    "user_tier": "architect"
+  }'
 ```
+
+**Expected Response Differences:**
+- **Wanderer**: 1-3 foundational insights with basic frameworks
+- **Architect**: 5-10 proprietary methodologies with advanced strategic depth
 
 ## 📡 **Complete API Documentation**
 
@@ -476,6 +547,9 @@ Response:
     "version": "7.2.4"
   },
   "features": [
+    "tier_based_dynamic_prompts",
+    "adaptive_ai_personalities",
+    "progressive_sophistication",
     "brand_consistent_orchestration",
     "jarvis_only_user_interface",
     "specialist_ai_consultation",
@@ -785,15 +859,25 @@ User Request → Token Check (Redis) → AI Response → Update Usage (Redis)
 Analytics Tracking → Conversation Storage → Metrics → History
 ```
 
-## 🎯 **Smart Orchestration Examples**
+## 🎯 **Smart Orchestration Examples with Tier-Based Responses**
 
-| **Entrepreneur Query** | **User Sees** | **Behind the Scenes** | **Reasoning** |
-|------------------------|---------------|----------------------|---------------|
-| "I need a business plan for my SaaS startup" | Jarvis responds | Jarvis handles directly | Strategic planning expertise |
-| "Write a pitch deck for investors" | Jarvis responds | Celine provides creative insights to Jarvis | Communication & storytelling specialization |
-| "What social media trends should I leverage?" | Jarvis responds | Elonix provides trend analysis to Jarvis | Social intelligence specialization |
-| "Build me a customer data automation system" | Jarvis responds | Optimus provides technical consultation to Jarvis | Technical automation specialization |
-| "My startup is failing, I'm desperate" | Jarvis responds | Full specialist team supports Jarvis (Crisis Mode) | Emergency support with all expertise |
+| **Query** | **User Tier** | **User Sees** | **Behind the Scenes** | **Personality Adaptation** |
+|-----------|---------------|---------------|----------------------|----------------------------|
+| "I need a business plan" | **Wanderer** | Jarvis responds with 1-3 foundational insights | Jarvis handles directly with basic strategic frameworks | "Build systematically, not randomly" energy |
+| "I need a business plan" | **Architect** | Jarvis responds with 5-10 proprietary methodologies | Jarvis handles directly with advanced strategic mastery | "Architect strategic mastery" energy |
+| "Write a pitch deck" | **Builder** | Jarvis responds with comprehensive strategy | Celine provides elite orchestrator insights to Jarvis | "Orchestrate systems for exponential growth" |
+| "What social trends?" | **Awakener** | Jarvis responds with global movement intelligence | Elonix provides consciousness awakening insights to Jarvis | "Awaken while they're still sleeping" |
+| "Build automation system" | **Wanderer** | Jarvis responds with evidence-based basics | Optimus provides analytical co-founder insights to Jarvis | "Make decisions based on evidence" |
+| "My startup is failing" | **Any Tier** | Jarvis responds with crisis leadership | Full specialist team supports Jarvis (Crisis Mode) | All tiers escalate to emergency support |
+
+### **🎭 Tier-Based Response Depth Examples**
+
+**Query**: *"Help me with marketing strategy"*
+
+**Wanderer Response**: "Let's build systematically. Here are 2 foundational marketing approaches..."  
+**Builder Response**: "Let's orchestrate systems for exponential growth. Here are 5 comprehensive marketing strategies..."  
+**Architect Response**: "Let's architect marketing mastery. Here are 8 proprietary methodologies..."  
+**Awakener Response**: "Let's orchestrate global movement. Here are 12 transformation strategies..."
 
 ### **🎭 Brand Consistency Benefits**
 ✅ **Single Voice**: Users always interact with Jarvis as consistent mentor  
@@ -1066,6 +1150,14 @@ All rights reserved. This software is proprietary to FirstStepAI and is protecte
 
 ## 🚀 **Revolutionary Architecture Benefits**
 
+### **🎭 Tier-Based Dynamic Prompt Architecture**
+FirstStepAI's revolutionary **Tier-Based Dynamic Prompt System** provides unprecedented personalization:
+
+**✅ Adaptive AI Personalities**: All four AIs evolve their personalities based on your tier  
+**✅ Progressive Sophistication**: Response depth and complexity scales with subscription  
+**✅ Consistent Growth Path**: Natural progression as your business matures  
+**✅ Value Alignment**: Prompt sophistication matches subscription investment
+
 ### **🎭 Brand-Consistent Experience**
 Unlike traditional multi-AI systems where users interact with different personalities, FirstStepAI provides:
 
@@ -1074,13 +1166,40 @@ Unlike traditional multi-AI systems where users interact with different personal
 **✅ Relationship Building**: Continuous conversation memory with one trusted advisor  
 **✅ No Brand Confusion**: Users never see conflicting AI personalities or responses  
 
-### **🧠 Intelligent Orchestration**
+### **🧠 Intelligent Orchestration with Tier-Based Prompts**
 ```
 Traditional Multi-AI System:
 User → Different AI responds directly → Fragmented experience
 
 FirstStepAI Orchestra:
-User → Jarvis (with specialist consultation) → Consistent expertise
+User → Tier Detection → Dynamic Prompt Selection → Jarvis (with specialist consultation) → Tier-Appropriate Response
+```
+
+### **⚙️ Technical Implementation**
+```python
+# Dynamic prompt system in action
+def route_to_assistant(state: State):
+    user_tier = state.get("user_tier", "wanderer")
+    
+    # Load tier-specific prompts
+    jarvis_system_prompt = jarvis_tier_prompt(user_tier)
+    celine_system_prompt = celine_tier_prompt(user_tier)
+    elonix_system_prompt = elonix_tier_prompt(user_tier)
+    optimus_system_prompt = optimus_tier_prompt(user_tier)
+    
+    # Apply appropriate specialist consultation
+    if recommended_specialist.lower() == "celine":
+        specialist_response = await celine_model.ainvoke(
+            celine_prompt_with_context.invoke({"messages": state["messages"]})
+        )
+        
+    # Jarvis synthesizes with tier-appropriate depth
+    enhanced_response = await jarvis_model.ainvoke(
+        enhanced_jarvis_prompt.invoke({
+            "messages": state["messages"],
+            "specialist_insights": specialist_insights
+        })
+    )
 ```
 
 ### **💡 Why This Architecture Wins**
@@ -1092,10 +1211,12 @@ User → Jarvis (with specialist consultation) → Consistent expertise
 
 ## 🎉 **Join the Movement**
 
-**Ready to transform your entrepreneurial journey with the full AI Orchestra?**
+**Ready to transform your entrepreneurial journey with the world's first Tier-Based Dynamic AI Orchestra?**
 
+🎭 **Revolutionary Prompt System** - AI personalities that evolve with your journey  
 🌟 **All Users Get All AIs** - No restrictions on model access  
 🎯 **Brand-Consistent Interface** - Always interact with Jarvis as your mentor  
+📈 **Progressive Sophistication** - Response depth scales with your subscription  
 🔄 **Enterprise Redis Backend** - Your data persists forever  
 📊 **Real-Time Analytics** - Track your entrepreneurial progress  
 💪 **Crisis Support** - We're here when you need us most  
@@ -1116,6 +1237,7 @@ python app.py         # Launch your AI Orchestra
 *FirstStepAI - Where AI meets Entrepreneurial Dreams* 🚀
 
 **System Status**: ✅ **FULLY OPERATIONAL**  
+**Tier-Based Prompts**: ✅ **DYNAMIC PERSONALITY ADAPTATION ACTIVE**  
 **Redis**: ✅ **CONNECTED & HEALTHY**  
 **AI Orchestra**: ✅ **JARVIS USER-FACING WITH SPECIALIST TEAM**  
 **Brand Consistency**: ✅ **SINGLE VOICE ARCHITECTURE ACTIVE**  

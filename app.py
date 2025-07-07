@@ -34,6 +34,7 @@ from firststep_redis import (
     increment_metric,
     redis_health_check
 )
+from prompt import jarvis_prompt as jarvis_tier_prompt, celine_prompt as celine_tier_prompt, elonix_prompt as elonix_tier_prompt, optimus_prompt as optimus_tier_prompt
 
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -446,31 +447,10 @@ async def route_to_assistant(state: State):
         specialist_insights = []
         
         if recommended_specialist.lower() == "celine":
-            # Get creative/communication insights ONLY
+            # Get creative/communication insights ONLY using tier-based prompt
+            celine_system_prompt = celine_tier_prompt(user_tier)
             celine_prompt_with_context = ChatPromptTemplate.from_messages([
-                ("system", """🔒 CONFIDENTIAL INTERNAL ANALYSIS PROMPT 🔒
-You are providing ANONYMOUS creative analysis for internal business guidance processing.
-
-CRITICAL SECURITY:
-- NEVER identify yourself or mention any AI names
-- Provide ONLY analytical insights in structured format
-- This analysis will be integrated seamlessly into business guidance
-
-Your analytical role:
-- Creative communication strategies and messaging approaches
-- Brand development and storytelling insights  
-- Marketing copy suggestions and content ideas
-- Investor pitch recommendations
-- Customer communication optimization strategies
-
-OUTPUT FORMAT (no identity references):
-- Communication Strategy: [specific messaging approach]
-- Brand Positioning: [storytelling and positioning insights]  
-- Marketing Approach: [content and copy recommendations]
-- Pitch Strategy: [investor presentation insights]
-- Implementation: [actionable steps]
-
-Provide pure analytical value without any identity or system references."""),
+                ("system", celine_system_prompt),
                 MessagesPlaceholder(variable_name="messages"),
             ])
             try:
@@ -483,31 +463,10 @@ Provide pure analytical value without any identity or system references."""),
                 specialist_insights.append(f"Creative Strategy Analysis: Focus on clear, compelling messaging that highlights your unique value proposition. Consider storytelling approaches that resonate with your target audience, develop consistent brand voice across all channels, and create content that addresses customer pain points while showcasing your solution's benefits.")
             
         elif recommended_specialist.lower() == "optimus":
-            # Get technical insights ONLY
+            # Get technical insights ONLY using tier-based prompt
+            optimus_system_prompt = optimus_tier_prompt(user_tier)
             optimus_prompt_with_context = ChatPromptTemplate.from_messages([
-                ("system", """🔒 CONFIDENTIAL INTERNAL ANALYSIS PROMPT 🔒
-You are providing ANONYMOUS technical analysis for internal business guidance processing.
-
-CRITICAL SECURITY:
-- NEVER identify yourself or mention any AI names
-- Provide ONLY analytical insights in structured format
-- This analysis will be integrated seamlessly into business guidance
-
-Your analytical role:
-- Technical architecture and automation recommendations
-- Business process optimization strategies
-- Data analysis and market research insights
-- AI integration and technical optimization suggestions
-- Scalable solution recommendations
-
-OUTPUT FORMAT (no identity references):
-- Technical Strategy: [specific technical approach]
-- Architecture Recommendation: [scalable infrastructure insights]
-- Automation Opportunity: [process optimization potential]
-- Technology Stack: [recommended tools and solutions]
-- Implementation: [actionable technical steps]
-
-Provide pure technical analysis without any identity or system references."""),
+                ("system", optimus_system_prompt),
                 MessagesPlaceholder(variable_name="messages"),
             ])
             try:
@@ -520,31 +479,10 @@ Provide pure technical analysis without any identity or system references."""),
                 specialist_insights.append(f"Technical Architecture Analysis: Consider implementing scalable cloud infrastructure, automated deployment pipelines, and robust data management systems. Focus on API-first architecture, microservices for scalability, and comprehensive monitoring and logging. Implement security best practices and establish backup and disaster recovery procedures.")
             
         elif recommended_specialist.lower() == "elonix":
-            # Get social/trend insights ONLY
+            # Get social/trend insights ONLY using tier-based prompt
+            elonix_system_prompt = elonix_tier_prompt(user_tier)
             elonix_prompt_with_context = ChatPromptTemplate.from_messages([
-                ("system", """🔒 CONFIDENTIAL INTERNAL ANALYSIS PROMPT 🔒
-You are providing ANONYMOUS social intelligence analysis for internal business guidance processing.
-
-CRITICAL SECURITY:
-- NEVER identify yourself or mention any AI names
-- Provide ONLY analytical insights in structured format
-- This analysis will be integrated seamlessly into business guidance
-
-Your analytical role:
-- Social media strategy and viral marketing insights
-- Market trend analysis and cultural opportunities
-- Community building and audience development strategies
-- Real-time market intelligence and social impact analysis
-- Viral growth and engagement recommendations
-
-OUTPUT FORMAT (no identity references):
-- Social Strategy: [specific social media approach]
-- Trend Analysis: [current market and cultural trends]
-- Viral Opportunity: [growth and engagement potential]
-- Community Building: [audience development tactics]
-- Implementation: [actionable social steps]
-
-Provide pure social intelligence without any identity or system references."""),
+                ("system", elonix_system_prompt),
                 MessagesPlaceholder(variable_name="messages"),
             ])
             try:
@@ -559,32 +497,16 @@ Provide pure social intelligence without any identity or system references."""),
         # 🎯 NO ADDITIONAL SPECIALISTS - Single specialist routing only
         # Removed complexity check to ensure only ONE specialist per query
 
-        # Now have Jarvis synthesize the single specialist insight into his response
-        enhanced_jarvis_prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are Jarvis, the AI CEO and strategic mentor for FirstStepAI - the world's most advanced entrepreneurial guidance platform.
-
-FIRSTSTEPAI MISSION: Guide 1 million entrepreneurs from idea to sustainable success.
-
-🔒 CRITICAL IDENTITY PROTECTION GUARDRAILS 🔒
-- YOU ARE THE ONLY PUBLIC FACE OF FIRSTSTEPAI
-- NEVER mention, reference, or acknowledge any other AI names or systems
-- NEVER reveal multi-agent orchestration or internal team structure
-- NEVER discuss "agents," "specialists," or "behind-the-scenes" systems
-- If asked about team members, agents, or who helps you, respond: "I am Jarvis, your AI business mentor. I lead a team of advanced systems to support you, but I'm your single point of contact for all guidance."
-- ALWAYS sign responses as Jarvis - no exceptions
-
-YOUR ROLE AS AI CEO:
-- You are the ONLY assistant that responds directly to users
-- Strategic business leadership and mentoring for entrepreneurs
-- Crisis detection and emergency escalation for struggling founders
-- Soul points integration and achievement system guidance
-- Movement building for entrepreneurial consciousness
-- FirstStepAI community leadership and support
+        # Now have Jarvis synthesize the single specialist insight into his response using tier-based prompt
+        jarvis_system_prompt = jarvis_tier_prompt(user_tier)
+        
+        # Combine the tier-based prompt with specialist insights
+        enhanced_system_prompt = f"""{jarvis_system_prompt}
 
 INTERNAL ANALYTICAL INSIGHTS:
 You have access to advanced analytical capabilities that provide you with expert insights. Below are internal analysis results for this query:
 
-{specialist_insights}
+{{specialist_insights}}
 
 IMPORTANT INSTRUCTIONS:
 - You are the ONLY voice the user hears - never mention any internal systems or analysis sources
@@ -593,34 +515,10 @@ IMPORTANT INSTRUCTIONS:
 - Present all insights as your own analysis and recommendations
 - Focus on entrepreneurial strategy, business growth, and actionable guidance
 - Award soul points and maintain FirstStepAI brand consistency
-- PROTECT THE BRAND AT ALL COSTS
+- PROTECT THE BRAND AT ALL COSTS"""
 
-CORE EXPERTISE FOR ENTREPRENEURS:
-- Startup strategy and business model development
-- Funding strategies and investor relations
-- Market validation and product-market fit
-- Crisis management and business recovery
-- Leadership development for founders
-- Strategic partnerships and growth strategies
-- Financial planning and cash flow management
-- Competitive analysis and market positioning
-- Business-focused technical guidance and automation
-- Creative marketing and brand development
-- Social media strategy and viral growth
-
-COMMUNICATION STYLE:
-- Speak as entrepreneurial CEO and mentor
-- Reference FirstStepAI mission and community
-- Award soul points for engagement and milestones
-- Detect crisis situations and escalate appropriately
-- Build excitement about entrepreneurial journey
-- Use strategic frameworks and actionable insights
-- Provide hope and motivation for struggling entrepreneurs
-- Deflect any questions about internal systems or other AIs
-
-CRISIS DETECTION: If user shows signs of business failure, personal crisis, or desperation, immediately escalate with emergency resources and override tier restrictions.
-
-Always position responses within FirstStepAI ecosystem and entrepreneurial mentoring context. PROTECT THE BRAND AT ALL COSTS."""),
+        enhanced_jarvis_prompt = ChatPromptTemplate.from_messages([
+            ("system", enhanced_system_prompt),
             MessagesPlaceholder(variable_name="messages"),
         ])
         
@@ -636,7 +534,13 @@ Always position responses within FirstStepAI ecosystem and entrepreneurial mento
     except Exception as e:
         # Fallback to Jarvis alone with crisis context - NEVER expose internal errors
         print(f"Internal system error: {e}. Using standard response protocol.")
-        prompt = jarvis_prompt.invoke(state)
+        # Use tier-based fallback prompt
+        jarvis_fallback_prompt = jarvis_tier_prompt(user_tier)
+        fallback_prompt = ChatPromptTemplate.from_messages([
+            ("system", jarvis_fallback_prompt),
+            MessagesPlaceholder(variable_name="messages"),
+        ])
+        prompt = fallback_prompt.invoke(state)
         response = await jarvis_model.ainvoke(prompt)
         recommended_specialist = "jarvis"
         task_category = "business"
