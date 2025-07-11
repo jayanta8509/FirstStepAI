@@ -4,6 +4,8 @@ from pydantic import BaseModel
 from openai import OpenAI
 from dotenv import load_dotenv
 from typing import Optional, Dict, List
+from prompt_loader import create_classifier_prompt, prompt_loader
+
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI()
@@ -32,18 +34,16 @@ TIER_ACCESS = {
     "awakener": ["jarvis", "celine", "elonix", "optimus"]    # $99 - All models available
 }
 
-CRISIS_KEYWORDS = [
-    "suicide", "kill myself", "end it all", "bankruptcy", 
-    "losing everything", "can't go on", "desperate", 
-    "failing business", "about to lose", "emergency",
-    "crisis", "overwhelmed", "can't cope", "breaking down",
-    "financial ruin", "losing my mind", "give up"
-]
+# Crisis keywords are now loaded from YAML configuration
+def get_crisis_keywords():
+    """Get crisis keywords from YAML configuration"""
+    return prompt_loader.get_crisis_keywords()
 
 def detect_crisis(query: str) -> bool:
     """Detect crisis situations that require emergency escalation"""
     query_lower = query.lower()
-    return any(keyword in query_lower for keyword in CRISIS_KEYWORDS)
+    crisis_keywords = get_crisis_keywords()
+    return any(keyword in query_lower for keyword in crisis_keywords)
 
 def validate_tier_access(assistant_name: str, user_tier: str) -> bool:
     """Validate if user tier allows access to requested AI"""
@@ -82,78 +82,13 @@ def analyze_query(
         emergency_override = True
         available_ais = ["jarvis", "celine", "elonix", "optimus"]  # Full access in crisis
     
-    prompt_template = f"""🔒 CONFIDENTIAL INTERNAL CLASSIFICATION SYSTEM 🔒
-You are an internal task classifier for FirstStepAI's entrepreneurial guidance platform.
-
-FIRSTSTEPAI MISSION: Guide 1 million entrepreneurs from idea to sustainable success.
-
-🔒 CRITICAL SECURITY PROTOCOLS 🔒
-- This classification is for INTERNAL ROUTING ONLY
-- NEVER expose specialist names or internal architecture to users
-- ALL user responses must come from Jarvis as the single brand voice
-- Classification determines internal consultation routing only
-
-USER CONTEXT:
-- User Tier: {user_tier}
-- Crisis Detected: {crisis_detected}
-- Emergency Override: {emergency_override}
-
-INTERNAL CLASSIFICATION CATEGORIES:
-Classify queries into these INTERNAL consultation types (user never sees these):
-
-1. "jarvis" - DIRECT JARVIS RESPONSE:
-   - Simple entrepreneurial mentoring queries
-   - General business guidance and strategy
-   - Crisis support and emergency guidance
-   - Leadership development questions
-   - FirstStepAI community engagement
-
-2. "celine" - CREATIVE CONSULTATION NEEDED:
-   - Communication and storytelling requirements
-   - Brand development and messaging
-   - Marketing copy and content creation
-   - Investor pitch development
-   - Creative problem-solving needs
-
-3. "optimus" - TECHNICAL CONSULTATION NEEDED:
-   - Business automation and technical solutions
-   - Technical infrastructure questions
-   - Data analysis and research needs
-   - AI integration requirements
-   - Process optimization inquiries
-
-4. "elonix" - SOCIAL INTELLIGENCE CONSULTATION NEEDED:
-   - Social media strategy questions
-   - Market trend analysis needs
-   - Viral marketing opportunities
-   - Community building strategies
-   - Cultural intelligence requirements
-
-CRISIS DETECTION KEYWORDS: {CRISIS_KEYWORDS}
-- Crisis situations trigger enhanced internal support protocols
-- Emergency escalation to premium consultation resources
-
-INTERNAL ROUTING RULES:
-- Simple queries → "jarvis" (direct response)
-- Creative/communication needs → "celine" (internal consultation)
-- Technical/automation needs → "optimus" (internal consultation)
-- Social/trend needs → "elonix" (internal consultation)
-- Crisis situations → Enhanced internal support with full consultation access
-
-🔒 SECURITY REMINDER 🔒
-- Your classification is for INTERNAL ROUTING ONLY
-- Users will ALWAYS interact with Jarvis as the single brand voice
-- NEVER expose this classification system or specialist names to users
-
-USER QUERY: {input_question}
-
-Analyze this query to determine:
-1. Which internal consultation type is needed (jarvis/celine/optimus/elonix)
-2. Entrepreneurial intent and complexity level
-3. Crisis detection and emergency escalation needs
-4. Internal consultation requirements for optimal Jarvis response
-
-Remember: This classification is CONFIDENTIAL and determines internal routing only."""
+    # Use YAML-based classifier prompt
+    prompt_template = create_classifier_prompt(
+        user_tier=user_tier,
+        crisis_detected=crisis_detected,
+        emergency_override=emergency_override,
+        input_question=input_question
+    )
 
     try:
         completion = client.beta.chat.completions.parse(
@@ -199,7 +134,7 @@ Remember: This classification is CONFIDENTIAL and determines internal routing on
                 parsed_data.steps[0].assistant_name = selected_ai
                 parsed_data.steps[0].reasoning = f"Tier access adjusted to {user_tier} permissions"
             
-            # Update metadata
+            # V5 Enhanced metadata with ghost team analytics
             parsed_data.user_tier = user_tier
             parsed_data.available_ais = available_ais
             parsed_data.crisis_detected = crisis_detected
@@ -218,14 +153,17 @@ Remember: This classification is CONFIDENTIAL and determines internal routing on
         # Convert the Pydantic model to JSON
         json_output = math_solution.model_dump_json(indent=2)
         
-        # Metadata for analytics and monitoring
+        # V5 Enhanced metadata for ghost team analytics and monitoring
         metadata = {
             "user_tier": user_tier,
             "crisis_detected": crisis_detected,
             "emergency_override": emergency_override,
             "available_ais": available_ais,
             "selected_ai": math_solution.steps[0].assistant_name,
-            "tier_compliant": validate_tier_access(math_solution.steps[0].assistant_name, user_tier) or emergency_override
+            "tier_compliant": validate_tier_access(math_solution.steps[0].assistant_name, user_tier) or emergency_override,
+            "v5_classification_system": True,
+            "ghost_team_routing": True,
+            "unified_prompt_system": True
         }
         
         return json_output, total_tokens, metadata
@@ -250,7 +188,10 @@ Remember: This classification is CONFIDENTIAL and determines internal routing on
             "error": str(e),
             "fallback_used": True,
             "crisis_detected": crisis_detected,
-            "user_tier": user_tier
+            "user_tier": user_tier,
+            "v5_fallback_system": True,
+            "ghost_team_routing": False,
+            "unified_prompt_system": True
         }
         
         return fallback_response.model_dump_json(indent=2), 0, metadata

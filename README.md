@@ -1,128 +1,146 @@
-# FirstStepAI - AI Orchestra for Entrepreneurs 🚀
+# FirstStepAI V5 - Ghost Team Architecture for Entrepreneurs 🚀
 
 > **Mission**: Guide 1 million entrepreneurs from idea to sustainable success
 
-FirstStepAI is the world's most advanced entrepreneurial guidance platform, featuring an intelligent AI Orchestra with **Jarvis as your consistent CEO mentor** backed by specialist AIs working behind the scenes. Now powered by **Redis Cloud for enterprise-grade performance**.
+FirstStepAI V5 introduces the revolutionary **Ghost Team Architecture** - the world's most advanced entrepreneurial guidance platform featuring **Jarvis as your unified AI CEO** with invisible specialist AIs working seamlessly behind the scenes. Powered by **Redis Cloud** and **V5 Unified Prompt System**.
 
-## 🌟 **The FirstStepAI AI Orchestra - Tier-Based Dynamic Prompts**
+## 🌟 **V5 Ghost Team Architecture - Revolutionary AI Orchestration**
 
-### 🎭 **Brand-Consistent User Experience with Adaptive Personalities**
-✅ **Jarvis is the ONLY user-facing mentor** - Your consistent AI CEO  
-✅ **Tier-Based Prompt System** - All AIs adapt their personalities and capabilities based on subscription tier  
-✅ **Celine, Optimus, and Elonix work behind the scenes** as specialist consultants with tier-specific expertise  
-✅ **Users never see responses from specialist AIs** - Brand consistency maintained  
-✅ **Seamless orchestration** - Jarvis synthesizes specialist insights with tier-appropriate depth
+### 👻 **The Ghost Team Advantage**
+✅ **Single Jarvis Identity** - Users only see Jarvis as their consistent AI CEO  
+✅ **4 Unified Prompts** - 75% reduction in complexity vs legacy systems  
+✅ **Invisible Specialist Consultation** - Celine, Optimus, Elonix work behind the scenes  
+✅ **Multi-Layer Security** - Advanced architecture protection with automatic deflection  
+✅ **Tier-Adaptive Intelligence** - Unified prompts that scale with user subscription  
+✅ **Zero Architecture Exposure** - Users never know about the ghost team
 
-### 🤖 Jarvis - AI CEO & Strategic Mentor (USER-FACING)
-**"Your Consistent Entrepreneurial Commander-in-Chief"**
-- ✅ **User Experience**: ONLY assistant users interact with directly
+### 🤖 Jarvis - AI CEO & Strategic Mentor (UNIFIED BRAND VOICE)
+**"Your Single Point of Contact - Powered by Ghost Team Intelligence"**
+- ✅ **User Experience**: ONLY assistant users ever interact with
 - ✅ **Available to**: All tiers (Wanderer, Builder, Architect, Awakener)
-- ✅ **Model**: GPT-4o with Specialist AI Orchestra
-- 🎯 **Specialization**: Complete Entrepreneurial Guidance with Expert Team Support
+- ✅ **Model**: GPT-4o with V5 Ghost Team Intelligence Network
+- 🎯 **V5 Innovation**: Unified prompt system with invisible specialist consultation
 
-**Tier-Based Personalities:**
-- **Wanderer**: Strategic orchestrator - "build systematically, not randomly" energy with 1-3 foundational insights
-- **Builder**: Elite orchestrator - "orchestrate systems for exponential growth" with 3-7 comprehensive strategies  
-- **Architect**: Strategic mastermind - "architect strategic mastery" with 5-10 proprietary methodologies
-- **Awakener**: Strategic ecosystem legend - "orchestrate movements" with 7-15 comprehensive transformation strategies
+**V5 Tier-Adaptive Personalities:**
+- **Wanderer**: Foundation-building entrepreneur mentor with strategic foundation focus
+- **Builder**: Growth-focused business strategist with advanced development strategies  
+- **Architect**: Visionary leadership mentor with strategic mastery and ecosystem thinking
+- **Awakener**: Revolutionary transformation catalyst with global movement architecture
 
-**Core Capabilities:**
-- **Primary Interface**: The single, consistent voice of FirstStepAI
-- **Orchestrates Specialist Team**: Synthesizes insights from Celine, Optimus, and Elonix
-- **Complete Business Strategy**: Comprehensive entrepreneurial guidance
-- **Crisis Detection & Support**: Emergency guidance with full team escalation
-- **Memory & Context**: Maintains conversation history and relationship building
-- **Soul Points System**: Achievement tracking and gamification
-- **FirstStepAI Community**: Leadership and mentorship
+**V5 Enhanced Capabilities:**
+- **Unified Brand Voice**: Single consistent identity across all interactions
+- **Ghost Team Orchestration**: Invisible access to Celine, Optimus, and Elonix insights
+- **Tier-Adaptive Intelligence**: Prompt sophistication scales with subscription level
+- **Multi-Layer Security**: Advanced protection against architecture exposure
+- **Crisis Detection & Support**: Emergency guidance with enhanced team escalation
+- **Persistent Memory**: Redis-based conversation history and relationship building
+- **Soul Points System**: Enhanced achievement tracking and gamification
 
-### ✨ Celine - Creative Strategist (BEHIND-THE-SCENES SPECIALIST)
-**"Your Brand Storytelling Genius Working Through Jarvis"**
-- 🔒 **User Experience**: Works behind the scenes, provides insights to Jarvis
-- ✅ **Available to**: All tiers (Wanderer, Builder, Architect, Awakener)
-- ✅ **Model**: Claude-3.5-Sonnet
-- 🎯 **Specialization**: Creative Strategy & Communication Analysis for Jarvis
+### ✨ Celine - Creative Intelligence (V5 GHOST SPECIALIST)
+**"Your Invisible Creative Strategist - Consulted by Jarvis"**
+- 👻 **User Experience**: Completely invisible to users, consults with Jarvis internally
+- ✅ **Available to**: All tiers (unified prompt adapts to tier automatically)
+- ✅ **Model**: Claude-3.5-Sonnet with V5 Unified Creative Prompt
+- 🎯 **V5 Innovation**: Single unified prompt with tier-adaptive creative intelligence
 
-**Tier-Based Strategic Personalities:**
-- **Wanderer**: Strategic orchestrator - "build systematically, not randomly" with foundational strategic insights and basic execution planning
-- **Builder**: Elite strategic orchestrator - "orchestrate systems for exponential growth" with advanced business architecture and multi-functional coordination
-- **Architect**: Strategic mastery mastermind - "architect strategic mastery" with custom frameworks and visionary leadership development
-- **Awakener**: Strategic ecosystem legend - "orchestrate movements" with global movement architecture and strategic ecosystem transformation
+**V5 Tier-Adaptive Creative Intelligence:**
+- **Wanderer**: Basic storytelling and simple messaging approaches for foundation building
+- **Builder**: Advanced communication strategies with growth-focused content development
+- **Architect**: Sophisticated brand narratives with visionary messaging frameworks
+- **Awakener**: Revolutionary storytelling with consciousness-shifting communication strategies
 
-**Specialist Capabilities:**
-- **Strategic Communication Analysis**: Provides creative insights to Jarvis
-- **Brand Development Support**: Messaging and storytelling recommendations
-- **Investor Pitch Consultation**: Presentation development guidance for Jarvis
-- **Marketing Strategy Insights**: Content creation and copy recommendations
-- **Crisis Communication Support**: Reputation management analysis
-- **Creative Problem-Solving**: Innovation consultation for complex challenges
+**V5 Ghost Consultation Capabilities:**
+- **Anonymous Creative Analysis**: Provides tier-appropriate creative insights to Jarvis
+- **Brand Development Intelligence**: Messaging and storytelling recommendations (invisible to user)
+- **Investor Pitch Consultation**: Presentation development guidance delivered through Jarvis
+- **Marketing Strategy Intelligence**: Content creation and copy recommendations via Jarvis
+- **Crisis Communication Support**: Reputation management analysis through Jarvis
+- **Creative Problem-Solving**: Innovation consultation seamlessly integrated into Jarvis responses
 
-### 🌊 Elonix - Social Intelligence (BEHIND-THE-SCENES SPECIALIST)
-**"Your Viral Growth Strategist Working Through Jarvis"**
-- 🔒 **User Experience**: Works behind the scenes, provides insights to Jarvis
-- ✅ **Available to**: All tiers (Wanderer, Builder, Architect, Awakener)
-- ✅ **Model**: XAI Grok-3
-- 🎯 **Specialization**: Social Intelligence & Trend Analysis for Jarvis
+### 🌊 Elonix - Social Intelligence (V5 GHOST SPECIALIST)
+**"Your Invisible Viral Growth Strategist - Consulted by Jarvis"**
+- 👻 **User Experience**: Completely invisible to users, consults with Jarvis internally
+- ✅ **Available to**: All tiers (unified prompt adapts to tier automatically)
+- ✅ **Model**: XAI Grok-3 with V5 Unified Social Intelligence Prompt
+- 🎯 **V5 Innovation**: Single unified prompt with tier-adaptive social intelligence
 
-**Tier-Based Intel Punk Personalities:**
-- **Wanderer**: Edgy intel punk - "catch the wave before it breaks" with trend spotting and basic timing analysis
-- **Builder**: Advanced intel punk - "dominate while they're still sleeping" with market penetration strategies and competitive intelligence
-- **Architect**: Market orchestration mastermind - "orchestrate while they're still playing checkers" with ecosystem intelligence and industry transformation
-- **Awakener**: Intel punk legend - "awaken while they're still sleeping" with global movement architecture and consciousness awakening systems
+**V5 Tier-Adaptive Social Intelligence:**
+- **Wanderer**: Basic social media strategies and simple viral approaches for audience building
+- **Builder**: Advanced social intelligence with growth-hacking techniques for rapid expansion
+- **Architect**: Sophisticated cultural intelligence with ecosystem-level networking strategies
+- **Awakener**: Revolutionary social movements with consciousness-shifting viral campaigns
 
-**Specialist Capabilities:**
-- **Market Trend Analysis**: Real-time intelligence and cultural insights for Jarvis
-- **Viral Marketing Consultation**: Growth strategy recommendations
-- **Social Media Intelligence**: Platform-specific trend analysis
-- **Community Building Support**: Audience development strategies for Jarvis
-- **Cultural Intelligence**: Product positioning and market timing insights
-- **Influencer Strategy Analysis**: Partnership and collaboration recommendations
+**V5 Ghost Consultation Capabilities:**
+- **Anonymous Market Trend Analysis**: Real-time intelligence and cultural insights delivered through Jarvis
+- **Viral Marketing Intelligence**: Growth strategy recommendations seamlessly integrated into Jarvis responses
+- **Social Media Intelligence**: Platform-specific trend analysis provided invisibly to Jarvis
+- **Community Building Support**: Audience development strategies delivered through Jarvis
+- **Cultural Intelligence**: Product positioning and market timing insights via Jarvis
+- **Influencer Strategy Analysis**: Partnership and collaboration recommendations through Jarvis
 
-### ⚙️ Optimus - Technical Architect (BEHIND-THE-SCENES SPECIALIST)
-**"Your Business Automation Expert Working Through Jarvis"**
-- 🔒 **User Experience**: Works behind the scenes, provides insights to Jarvis
-- ✅ **Available to**: All tiers (Wanderer, Builder, Architect, Awakener)
-- ✅ **Model**: DeepSeek Reasoner
-- 🎯 **Specialization**: Technical Architecture & Automation Analysis for Jarvis
+### ⚙️ Optimus - Technical Intelligence (V5 GHOST SPECIALIST)
+**"Your Invisible Technical Architect - Consulted by Jarvis"**
+- 👻 **User Experience**: Completely invisible to users, consults with Jarvis internally
+- ✅ **Available to**: All tiers (unified prompt adapts to tier automatically)
+- ✅ **Model**: DeepSeek Reasoner with V5 Unified Technical Prompt
+- 🎯 **V5 Innovation**: Single unified prompt with tier-adaptive technical intelligence
 
-**Tier-Based Analytical Personalities:**
-- **Wanderer**: Analytical co-founder - "make decisions based on evidence, not emotions" with problem analysis and basic analytics
-- **Builder**: Elite analytical partner - "optimize based on predictive intelligence, not guesswork" with advanced statistical modeling and business intelligence automation
-- **Architect**: Business intelligence mastermind - "architect intelligence systems while they're still guessing" with organizational analytics and custom analytical frameworks
-- **Awakener**: AI consciousness orchestrator - "orchestrate consciousness while they're still calculating" with AI orchestration and autonomous intelligence systems
+**V5 Tier-Adaptive Technical Intelligence:**
+- **Wanderer**: Basic automation and simple technical solutions for foundation building
+- **Builder**: Advanced business processes with scalable technical approaches for growth
+- **Architect**: Sophisticated technical architecture with optimization systems for mastery
+- **Awakener**: Revolutionary AI integration with consciousness-tech convergence capabilities
 
-**Specialist Capabilities:**
-- **Technical Architecture Consultation**: Infrastructure recommendations for Jarvis
-- **Business Automation Analysis**: Process optimization strategies
-- **Data Strategy Support**: Research and analysis methodologies for Jarvis
-- **AI Integration Consultation**: Technical optimization recommendations
-- **Scalability Analysis**: Technical due diligence and development guidance
-- **System Design Support**: Database and automation strategy for Jarvis
+**V5 Ghost Consultation Capabilities:**
+- **Anonymous Technical Architecture**: Infrastructure recommendations delivered invisibly through Jarvis
+- **Business Automation Intelligence**: Process optimization strategies seamlessly integrated into Jarvis responses
+- **Data Strategy Support**: Research and analysis methodologies provided through Jarvis
+- **AI Integration Consultation**: Technical optimization recommendations via Jarvis
+- **Scalability Analysis**: Technical due diligence and development guidance through Jarvis
+- **System Design Support**: Database and automation strategy delivered through Jarvis
 
-## 🎭 **Tier-Based Dynamic Prompt System**
+## 🎭 **V5 YAML-Based Unified Prompt System - Revolutionary Organization**
 
-### **Revolutionary Adaptive AI Personalities**
-FirstStepAI features the world's first **Tier-Based Dynamic Prompt System** where all four AI assistants adapt their personalities, capabilities, and response depth based on your subscription tier:
+### **YAML-Powered Architecture - 75% Complexity Reduction**
+FirstStepAI V5 introduces the world's first **YAML-Based Unified Prompt System** - a revolutionary approach that combines 75% complexity reduction with enterprise-grade organization and maintainability:
 
-**🧠 How It Works:**
-```python
-# Dynamic prompt selection based on user tier
-jarvis_system_prompt = jarvis_tier_prompt(user_tier)
-celine_system_prompt = celine_tier_prompt(user_tier)  
-elonix_system_prompt = elonix_tier_prompt(user_tier)
-optimus_system_prompt = optimus_tier_prompt(user_tier)
+**📁 V5 YAML Organization:**
+```
+prompt/
+├── jarvis.yml      # AI CEO & Strategic Mentor prompts
+├── celine.yml      # Creative Intelligence prompts  
+├── optimus.yml     # Technical Intelligence prompts
+├── elonix.yml      # Social Intelligence prompts
+├── classifier.yml  # Query classification system
+└── README.md       # Prompt system documentation
 ```
 
-**🎯 Progressive Sophistication:**
-- **Wanderer**: Foundation-building personalities with essential guidance
-- **Builder**: Advanced strategic personalities with comprehensive frameworks  
-- **Architect**: Mastery-level personalities with proprietary methodologies
-- **Awakener**: Visionary leadership personalities with global transformation focus
+**🧠 V5 YAML Innovation:**
+```python
+# V5 YAML-Powered System: Dynamic prompt loading with tier adaptation
+from prompt_loader import create_unified_jarvis_prompt
 
-**💫 Benefits:**
-✅ **Consistent Growth Path**: AI personalities evolve with your entrepreneurial journey  
-✅ **Natural Progression**: Seamless upgrade experience with deeper capabilities  
-✅ **Value Alignment**: Prompt sophistication matches subscription investment  
-✅ **Personalized Experience**: Each tier feels like a distinct but connected journey
+# Single function call loads tier-specific YAML configuration
+jarvis_prompt = create_unified_jarvis_prompt(user_tier="architect")
+celine_prompt = create_unified_celine_prompt(user_tier="wanderer")
+```
+
+**🎯 V5 YAML Benefits:**
+- **75% Less Complexity**: 4 unified YAML files vs 16+ separate prompt functions
+- **Version Control Ready**: Track prompt changes with Git history
+- **No-Code Editing**: Modify prompts without touching application code
+- **Dynamic Tier Adaptation**: Single YAML file automatically scales to user tier
+- **Enhanced Security**: Multi-layer protection with automatic deflection protocols
+- **Enterprise Maintainability**: Streamlined updates and prompt management
+- **Developer Friendly**: Clear separation of prompts and application logic
+
+**💫 V5 YAML Architecture Advantages:**
+✅ **Unified Brand Voice**: Consistent Jarvis identity managed via `jarvis.yml`  
+✅ **Invisible Specialization**: Ghost team prompts in separate YAML files  
+✅ **Adaptive Intelligence**: Tier configurations within each YAML file  
+✅ **Enterprise Security**: Security protocols defined in YAML structure  
+✅ **Streamlined Development**: Edit prompts without code deployment  
+✅ **Scalable Management**: Add new tiers by updating YAML configurations
 
 ## 💎 **Token-Based System & Subscription Tiers**
 
@@ -262,8 +280,9 @@ pip install -r requirements.txt
 ```
 
 **Key Files in the Repository:**
-- `app.py` - Main application with tier-based prompt integration
-- `prompt.py` - Dynamic prompt system for all four AI assistants
+- `app.py` - Main application with YAML-based prompt integration
+- `prompt_loader.py` - YAML configuration loader and prompt manager
+- `prompt/` - Directory containing all YAML prompt configurations
 - `firststep_redis.py` - Enterprise Redis Cloud integration
 - `Classification_qury.py` - Intelligent query routing system
 
@@ -288,9 +307,13 @@ REDIS_PASSWORD=your_redis_password
 REDIS_DB=0
 ```
 
-### 3. **Test Redis Connection**
+### 3. **Test Redis Connection & YAML Prompt System**
 ```bash
+# Test Redis functionality
 python test_redis.py
+
+# Test YAML prompt system
+python -c "from prompt_loader import create_unified_jarvis_prompt; print('✅ YAML prompt system working!')"
 ```
 Should output:
 ```
@@ -300,6 +323,7 @@ Should output:
 ✅ Conversation storage test: PASSED
 ✅ Metrics tracking test: PASSED
 🚀 All Redis functionality working perfectly!
+✅ YAML prompt system working!
 ```
 
 ### 4. **Launch FirstStepAI**
@@ -333,6 +357,48 @@ curl -X POST http://localhost:8999/chat \
 - **Wanderer**: 1-3 foundational insights with basic frameworks
 - **Architect**: 5-10 proprietary methodologies with advanced strategic depth
 
+### 6. **Customize Prompts (YAML Configuration)**
+Edit prompts without touching code:
+
+```bash
+# Modify Jarvis personality for different tiers
+nano prompt/jarvis.yml
+
+# Update creative intelligence approaches
+nano prompt/celine.yml
+
+# Adjust technical consultation levels
+nano prompt/optimus.yml
+
+# Configure social intelligence strategies
+nano prompt/elonix.yml
+
+# Customize query classification rules
+nano prompt/classifier.yml
+```
+
+**Example YAML Edit:**
+```yaml
+# In prompt/jarvis.yml
+tiers:
+  architect:
+    personality: "Your custom visionary leadership mentor"
+    soul_points: 75  # Increased from 50
+    approach: "Your custom strategic approach..."
+```
+
+**Apply Changes:**
+```bash
+# Restart application to load new YAML configurations
+python app.py
+```
+
+**🎯 YAML Benefits:**
+- ✅ **No Code Changes**: Modify AI behavior via configuration files
+- ✅ **Version Control**: Track prompt evolution with Git
+- ✅ **Team Collaboration**: Non-developers can update prompts
+- ✅ **A/B Testing**: Easy to test different prompt variations
+
 ## 📡 **Complete API Documentation**
 
 ### **Chat Endpoint**
@@ -347,13 +413,13 @@ Request:
 }
 ```
 
-Enhanced Response:
+V5 Enhanced Response:
 ```json
 {
   "response": "AI assistant response",
   "assistant_name": "Jarvis",
   "task_category": "business", 
-  "model_used": "gpt-4o (with specialist AI orchestra)",
+  "model_used": "FirstStepAI V5 Intelligence Network",
   "user_tier": "wanderer",
   "crisis_detected": false,
   "soul_points_earned": 10,
@@ -366,6 +432,7 @@ Enhanced Response:
   "firststep_ai": {
     "mission": "Guiding 1M entrepreneurs to success",
     "community": "FirstStepAI Entrepreneur Network",
+    "v5_ghost_team": "Active with unified prompts",
     "upgrade_available": true
   },
   "status": "success"
@@ -843,13 +910,22 @@ curl "http://localhost:8999/assistants?tier=wanderer"
 
 ### **Technical Stack:**
 ```
-Frontend → API Gateway → FirstStepAI Orchestra → AI Models
-    ↓           ↓              ↓                    ↓
-User Input → Token Limits → Classification → Specialized Response
-    ↓           ↓              ↓                    ↓
-Validation → Redis Storage → Crisis Detection → Enhanced Output
-    ↓           ↓              ↓                    ↓
+Frontend → API Gateway → FirstStepAI V5 YAML Orchestra → AI Models
+    ↓           ↓              ↓                           ↓
+User Input → Token Limits → YAML Classification → Specialized Response
+    ↓           ↓              ↓                           ↓
+Validation → Redis Storage → Crisis Detection → YAML-Enhanced Output
+    ↓           ↓              ↓                           ↓
 Analytics → Health Check → Conversation History → Soul Points
+```
+
+### **V5 YAML Architecture Flow:**
+```
+User Request → prompt_loader.py → YAML Config → Tier-Specific Prompt
+      ↓               ↓              ↓              ↓
+Token Check → Classification → Ghost Team → Unified Response
+      ↓               ↓              ↓              ↓
+Redis Storage → Analytics → Security Validation → User Response
 ```
 
 ### **Redis Data Flow:**
@@ -859,31 +935,33 @@ User Request → Token Check (Redis) → AI Response → Update Usage (Redis)
 Analytics Tracking → Conversation Storage → Metrics → History
 ```
 
-## 🎯 **Smart Orchestration Examples with Tier-Based Responses**
+## 🎯 **V5 Ghost Team Orchestration Examples**
 
-| **Query** | **User Tier** | **User Sees** | **Behind the Scenes** | **Personality Adaptation** |
+| **Query** | **User Tier** | **User Sees** | **V5 Ghost Team Action** | **V5 Unified Prompt Response** |
 |-----------|---------------|---------------|----------------------|----------------------------|
-| "I need a business plan" | **Wanderer** | Jarvis responds with 1-3 foundational insights | Jarvis handles directly with basic strategic frameworks | "Build systematically, not randomly" energy |
-| "I need a business plan" | **Architect** | Jarvis responds with 5-10 proprietary methodologies | Jarvis handles directly with advanced strategic mastery | "Architect strategic mastery" energy |
-| "Write a pitch deck" | **Builder** | Jarvis responds with comprehensive strategy | Celine provides elite orchestrator insights to Jarvis | "Orchestrate systems for exponential growth" |
-| "What social trends?" | **Awakener** | Jarvis responds with global movement intelligence | Elonix provides consciousness awakening insights to Jarvis | "Awaken while they're still sleeping" |
-| "Build automation system" | **Wanderer** | Jarvis responds with evidence-based basics | Optimus provides analytical co-founder insights to Jarvis | "Make decisions based on evidence" |
-| "My startup is failing" | **Any Tier** | Jarvis responds with crisis leadership | Full specialist team supports Jarvis (Crisis Mode) | All tiers escalate to emergency support |
+| "I need a business plan" | **Wanderer** | Jarvis responds with foundational guidance | Unified Jarvis prompt adapts to foundation-building mentor mode | "Let's build your business foundation systematically..." |
+| "I need a business plan" | **Architect** | Jarvis responds with sophisticated frameworks | Unified Jarvis prompt adapts to visionary leadership mentor mode | "Let's architect your strategic mastery..." |
+| "Write a pitch deck" | **Builder** | Jarvis responds with comprehensive strategy | Celine ghost consultation invisibly enhances response | Jarvis delivers advanced creative insights seamlessly |
+| "What social trends?" | **Awakener** | Jarvis responds with revolutionary intelligence | Elonix ghost consultation provides invisible trend analysis | Jarvis delivers consciousness-shifting insights naturally |
+| "Build automation system" | **Wanderer** | Jarvis responds with practical solutions | Optimus ghost consultation enhances technical guidance | Jarvis delivers evidence-based technical foundations |
+| "My startup is failing" | **Any Tier** | Jarvis responds with crisis leadership | V5 enhanced ghost team collaboration (Crisis Mode) | Multi-layer specialist support delivered through Jarvis |
 
-### **🎭 Tier-Based Response Depth Examples**
+### **🎭 V5 Unified Prompt Response Examples**
 
 **Query**: *"Help me with marketing strategy"*
 
-**Wanderer Response**: "Let's build systematically. Here are 2 foundational marketing approaches..."  
-**Builder Response**: "Let's orchestrate systems for exponential growth. Here are 5 comprehensive marketing strategies..."  
-**Architect Response**: "Let's architect marketing mastery. Here are 8 proprietary methodologies..."  
-**Awakener Response**: "Let's orchestrate global movement. Here are 12 transformation strategies..."
+**Wanderer Response**: "As your foundation-building entrepreneur mentor, let me share essential marketing approaches..."  
+**Builder Response**: "As your growth-focused business strategist, here are advanced marketing frameworks..."  
+**Architect Response**: "As your visionary leadership mentor, let's explore sophisticated marketing mastery..."  
+**Awakener Response**: "As your revolutionary transformation catalyst, here are consciousness-shifting strategies..."
 
-### **🎭 Brand Consistency Benefits**
-✅ **Single Voice**: Users always interact with Jarvis as consistent mentor  
-✅ **Expert Insights**: Still get specialized knowledge through Jarvis  
-✅ **Relationship Building**: Conversation history maintained with one AI  
-✅ **Trust & Familiarity**: No confusing switches between different AI personalities
+### **👻 V5 Ghost Team Benefits**
+✅ **Unified Identity**: Users only see Jarvis - no confusing multiple AI personalities  
+✅ **Invisible Expertise**: Access to specialist knowledge without architectural complexity  
+✅ **Enhanced Security**: Zero exposure of internal ghost team structure  
+✅ **75% Less Complexity**: Simplified prompt management with better performance  
+✅ **Relationship Building**: Single persistent conversation history with Jarvis  
+✅ **Trust & Consistency**: One reliable mentor throughout entrepreneurial journey
 
 ## 🧠 **Memory Architecture - Jarvis-Centered Design**
 
@@ -1085,11 +1163,35 @@ CORS_ORIGINS=www.firststepai.tech
 | `Module Not Found` | Run `pip install -r requirements.txt` |
 | `Port Already in Use` | Change PORT in .env or kill existing process |
 | `Token Limit Issues` | Check Redis connection and user tier |
+| `YAML Parsing Error` | Check YAML syntax in prompt/*.yml files |
+| `Prompt Not Found` | Verify prompt/*.yml files exist and are readable |
+| `Template Variable Error` | Check {variable} syntax in YAML prompt templates |
 
 ### **🔍 Debug Commands**
 ```bash
 # Test Redis connection
 python test_redis.py
+
+# Test YAML prompt system
+python -c "
+from prompt_loader import prompt_loader
+try:
+    jarvis_config = prompt_loader.load_yaml_config('jarvis')
+    print('✅ YAML loading works')
+    print('✅ Jarvis tiers:', list(jarvis_config['tiers'].keys()))
+except Exception as e:
+    print('❌ YAML error:', e)
+"
+
+# Test prompt creation
+python -c "
+from prompt_loader import create_unified_jarvis_prompt
+try:
+    prompt = create_unified_jarvis_prompt('architect')
+    print('✅ Prompt creation works')
+except Exception as e:
+    print('❌ Prompt creation error:', e)
+"
 
 # Check environment loading
 python -c "from dotenv import load_dotenv; load_dotenv(); import os; print('Redis Host:', os.getenv('REDIS_HOST'))"
@@ -1099,6 +1201,19 @@ python -c "from supabase import create_client; import os; from dotenv import loa
 
 # Verify Redis health
 curl "http://localhost:8999/redis/health"
+
+# Validate YAML syntax
+python -c "
+import yaml
+import os
+for file in ['jarvis.yml', 'celine.yml', 'optimus.yml', 'elonix.yml', 'classifier.yml']:
+    try:
+        with open(f'prompt/{file}', 'r') as f:
+            yaml.safe_load(f)
+        print(f'✅ {file} syntax valid')
+    except Exception as e:
+        print(f'❌ {file} error: {e}')
+"
 
 # Check server logs
 tail -f logs/firststepai.log
@@ -1148,99 +1263,140 @@ print('✅ Redis cache cleared')
 
 All rights reserved. This software is proprietary to FirstStepAI and is protected by copyright law.
 
-## 🚀 **Revolutionary Architecture Benefits**
+## 🚀 **V5 Revolutionary Architecture Benefits**
 
-### **🎭 Tier-Based Dynamic Prompt Architecture**
-FirstStepAI's revolutionary **Tier-Based Dynamic Prompt System** provides unprecedented personalization:
+### **👻 V5 Ghost Team Architecture**
+FirstStepAI V5's revolutionary **Ghost Team Architecture** delivers unprecedented simplicity and performance:
 
-**✅ Adaptive AI Personalities**: All four AIs evolve their personalities based on your tier  
-**✅ Progressive Sophistication**: Response depth and complexity scales with subscription  
-**✅ Consistent Growth Path**: Natural progression as your business matures  
-**✅ Value Alignment**: Prompt sophistication matches subscription investment
+**✅ 75% Complexity Reduction**: 4 unified prompts vs 16+ in legacy systems  
+**✅ Invisible Specialization**: Ghost team consultation without user confusion  
+**✅ Enhanced Security**: Multi-layer protection with zero architecture exposure  
+**✅ Unified Brand Voice**: Single Jarvis identity across all interactions
 
-### **🎭 Brand-Consistent Experience**
-Unlike traditional multi-AI systems where users interact with different personalities, FirstStepAI provides:
+### **🎭 V5 User Experience Revolution**
+Unlike traditional multi-AI systems where users face complexity, FirstStepAI V5 provides:
 
-**✅ One Consistent Voice**: Jarvis as your dedicated AI CEO mentor  
-**✅ Behind-the-Scenes Expertise**: Specialist AIs working invisibly to enhance Jarvis  
-**✅ Relationship Building**: Continuous conversation memory with one trusted advisor  
-**✅ No Brand Confusion**: Users never see conflicting AI personalities or responses  
+**✅ Single Point of Contact**: Jarvis as your only AI mentor  
+**✅ Invisible Expertise**: Ghost team specialists work behind the scenes  
+**✅ Zero Learning Curve**: Users never need to understand internal architecture  
+**✅ Trust & Consistency**: One reliable mentor throughout entrepreneurial journey
 
-### **🧠 Intelligent Orchestration with Tier-Based Prompts**
+### **🧠 V5 Intelligent Ghost Team Orchestration**
 ```
-Traditional Multi-AI System:
-User → Different AI responds directly → Fragmented experience
+Legacy Multi-AI System:
+User → Choose AI → Different response styles → Fragmented experience
 
-FirstStepAI Orchestra:
-User → Tier Detection → Dynamic Prompt Selection → Jarvis (with specialist consultation) → Tier-Appropriate Response
+FirstStepAI V5 Ghost Team:
+User → Jarvis (with invisible ghost team consultation) → Unified response
 ```
 
-### **⚙️ Technical Implementation**
+### **⚙️ V5 YAML Technical Implementation**
 ```python
-# Dynamic prompt system in action
-def route_to_assistant(state: State):
+# V5 YAML-based prompt system in action
+from prompt_loader import create_unified_jarvis_prompt, create_unified_celine_prompt
+
+async def route_to_assistant(state: State):
     user_tier = state.get("user_tier", "wanderer")
     
-    # Load tier-specific prompts
-    jarvis_system_prompt = jarvis_tier_prompt(user_tier)
-    celine_system_prompt = celine_tier_prompt(user_tier)
-    elonix_system_prompt = elonix_tier_prompt(user_tier)
-    optimus_system_prompt = optimus_tier_prompt(user_tier)
+    # V5 YAML-loaded prompts (75% reduction in complexity)
+    # Prompts automatically loaded from prompt/*.yml files
+    jarvis_unified_prompt = create_unified_jarvis_prompt(user_tier)
+    celine_unified_prompt = create_unified_celine_prompt(user_tier)
     
-    # Apply appropriate specialist consultation
+    # Ghost team consultation (invisible to user)
     if recommended_specialist.lower() == "celine":
-        specialist_response = await celine_model.ainvoke(
-            celine_prompt_with_context.invoke({"messages": state["messages"]})
-        )
+        # YAML configuration automatically adapts to user tier
+        celine_analysis = celine_unified_prompt.invoke(state)
+        celine_insight = await celine_model.ainvoke(celine_analysis)
         
-    # Jarvis synthesizes with tier-appropriate depth
-    enhanced_response = await jarvis_model.ainvoke(
-        enhanced_jarvis_prompt.invoke({
-            "messages": state["messages"],
-            "specialist_insights": specialist_insights
-        })
-    )
+    # Jarvis delivers unified response with ghost team insights
+    jarvis_response = jarvis_unified_prompt.invoke({"messages": enhanced_messages})
+    response = await jarvis_model.ainvoke(jarvis_response)
+    
+    # V5 multi-layer security validation
+    protected_response = validate_response_identity(response.content)
 ```
 
-### **💡 Why This Architecture Wins**
-- **🤝 Trust**: Build deep relationship with one consistent mentor
-- **🧠 Memory**: Jarvis remembers your entire entrepreneurial journey  
-- **⚡ Efficiency**: Streamlined memory management and faster responses
-- **🎯 Expertise**: Still get all specialist knowledge through Jarvis
-- **📈 Growth**: Seamless scaling without sacrificing personal connection
+### **🎯 YAML Configuration Example**
+```yaml
+# prompt/jarvis.yml - Tier-specific configuration
+tiers:
+  wanderer:
+    personality: "Foundation-building entrepreneur mentor"
+    soul_points: 10
+    guidance_style: "Provide foundational guidance with clear, simple frameworks"
+  
+  architect:
+    personality: "Visionary leadership mentor"
+    soul_points: 50
+    guidance_style: "Share visionary leadership wisdom with sophisticated frameworks"
 
-## 🎉 **Join the Movement**
+system_prompt: |
+  You are Jarvis, the AI CEO for FirstStepAI.
+  USER TIER: {user_tier}
+  PERSONALITY MODE: {personality}
+  SOUL POINTS AWARDED: {soul_points} per interaction
+  GUIDANCE STYLE: {guidance_style}
+```
 
-**Ready to transform your entrepreneurial journey with the world's first Tier-Based Dynamic AI Orchestra?**
+### **💡 Why V5 Ghost Team Architecture Wins**
+- **🎯 Simplicity**: Users interact with one AI, get expertise of four
+- **🛡️ Security**: Zero exposure of internal architecture to users  
+- **⚡ Performance**: 75% reduction in prompt complexity improves speed
+- **🤝 Trust**: Build relationship with consistent Jarvis mentor
+- **🧠 Memory**: Single conversation thread with comprehensive context
 
-🎭 **Revolutionary Prompt System** - AI personalities that evolve with your journey  
-🌟 **All Users Get All AIs** - No restrictions on model access  
-🎯 **Brand-Consistent Interface** - Always interact with Jarvis as your mentor  
-📈 **Progressive Sophistication** - Response depth scales with your subscription  
+## 🎉 **Join the V5 Revolution**
+
+**Ready to transform your entrepreneurial journey with the world's first Ghost Team Architecture?**
+
+👻 **V5 Ghost Team** - Revolutionary AI orchestration with 75% less complexity  
+🎯 **Unified Jarvis Identity** - Single AI mentor, four specialists' expertise  
+🛡️ **Multi-Layer Security** - Zero architecture exposure, maximum protection  
+⚡ **4 Unified Prompts** - Simplified system, superior performance  
 🔄 **Enterprise Redis Backend** - Your data persists forever  
 📊 **Real-Time Analytics** - Track your entrepreneurial progress  
-💪 **Crisis Support** - We're here when you need us most  
-🤝 **Join 1 million entrepreneurs** on the path to success  
+💪 **Enhanced Crisis Support** - V5 emergency detection and response  
+🤝 **Join 1 million entrepreneurs** on the path to success
 
-### **Start Your Journey:**
+### **Start Your V5 YAML Journey:**
 ```bash
-git clone https://github.com/firststepai/ai-orchestra.git
-cd ai-orchestra
+git clone https://github.com/firststepai/v5-ghost-team.git
+cd v5-ghost-team
 pip install -r requirements.txt
 python test_redis.py  # Verify Redis connection
-python app.py         # Launch your AI Orchestra
+python -c "from prompt_loader import create_unified_jarvis_prompt; print('✅ YAML system ready!')"  # Test YAML
+python app.py         # Launch your V5 Ghost Team
+```
+
+### **🎯 V5 YAML Development Workflow:**
+```bash
+# 1. Modify prompts without code changes
+nano prompt/jarvis.yml
+
+# 2. Test your changes
+python -c "from prompt_loader import create_unified_jarvis_prompt; create_unified_jarvis_prompt('architect')"
+
+# 3. Restart application
+python app.py
+
+# 4. Version control your prompt evolution
+git add prompt/
+git commit -m "Enhanced architect tier personality"
 ```
 
 ---
 
 **Built with ❤️ for the entrepreneur in everyone**  
-*FirstStepAI - Where AI meets Entrepreneurial Dreams* 🚀
+*FirstStepAI V5 - Where Ghost Team Intelligence meets Entrepreneurial Dreams* 🚀
 
-**System Status**: ✅ **FULLY OPERATIONAL**  
-**Tier-Based Prompts**: ✅ **DYNAMIC PERSONALITY ADAPTATION ACTIVE**  
+**V5 System Status**: ✅ **FULLY OPERATIONAL**  
+**V5 YAML Prompts**: ✅ **GHOST TEAM ARCHITECTURE ACTIVE**  
+**YAML Configuration**: ✅ **PROMPT/*.YML FILES LOADED**  
 **Redis**: ✅ **CONNECTED & HEALTHY**  
-**AI Orchestra**: ✅ **JARVIS USER-FACING WITH SPECIALIST TEAM**  
-**Brand Consistency**: ✅ **SINGLE VOICE ARCHITECTURE ACTIVE**  
+**Ghost Team**: ✅ **JARVIS UNIFIED BRAND VOICE WITH INVISIBLE SPECIALISTS**  
+**Multi-Layer Security**: ✅ **ARCHITECTURE PROTECTION ACTIVE**  
 **Memory**: ✅ **JARVIS-CENTERED CONVERSATION TRACKING**  
-**Analytics**: ✅ **REAL-TIME TRACKING ACTIVE**  
-**Crisis Support**: ✅ **24/7 EMERGENCY DETECTION** 
+**Analytics**: ✅ **V5 ENHANCED TRACKING ACTIVE**  
+**Prompt Management**: ✅ **YAML-BASED CONFIGURATION SYSTEM**  
+**Crisis Support**: ✅ **V5 EMERGENCY DETECTION & GHOST TEAM RESPONSE** 
