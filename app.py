@@ -339,9 +339,11 @@ async def route_to_assistant(state: State):
         if specialist_insights:
             # Add specialist insights as system context (invisible to user)
             insight_context = f"INTERNAL ANALYSIS AVAILABLE: {'; '.join(specialist_insights)}"
-            # This gets integrated into the Jarvis response without exposing the source
+            # Actually inject the specialist insights into the message context
+            from langchain_core.messages import SystemMessage
+            enhanced_messages.append(SystemMessage(content=insight_context))
         
-        # Jarvis provides unified response using tier-adapted prompt
+        # Jarvis provides unified response using tier-adapted prompt with specialist insights
         jarvis_analysis = jarvis_unified_prompt.invoke({"messages": enhanced_messages})
         response = await jarvis_model.ainvoke(jarvis_analysis)
         
