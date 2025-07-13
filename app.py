@@ -646,7 +646,7 @@ async def chat():
             "firststep_ai": {
                 "mission": "Guiding 1M entrepreneurs to success",
                 "community": "FirstStepAI Entrepreneur Network",
-                "mentor": "Jarvis - Your AI CEO and Strategic Guide",
+                "mentor": "Jarvis - Your AI CEO and Co-Founder",
                 "upgrade_available": user_tier != "awakener"
             }
         }

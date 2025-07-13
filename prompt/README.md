@@ -10,7 +10,7 @@ The V5 system uses **unified prompts** that automatically adapt to user tiers (w
 
 ### Core AI Agents
 
-- **`jarvis.yml`** - AI CEO & Strategic Mentor (Unified Brand Voice)
+- **`jarvis.yml`** - AI CEO & Co-Founder (Unified Brand Voice)
   - Public-facing entrepreneurial guidance
   - Tier-adaptive personality and capabilities
   - Crisis detection and escalation
