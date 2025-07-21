@@ -404,7 +404,7 @@ python app.py
 ### **Chat Endpoint**
 **POST** `/chat`
 
-Request:
+**Text-Only Request (JSON):**
 ```json
 {
   "query": "Your entrepreneurial question",
@@ -412,6 +412,21 @@ Request:
   "user_tier": "wanderer|builder|architect|awakener"
 }
 ```
+
+**File Upload Request (multipart/form-data):**
+```bash
+curl -X POST http://localhost:8999/chat \
+  -F "query=Analyze this document for my business strategy" \
+  -F "user_id=entrepreneur_123" \
+  -F "user_tier=builder" \
+  -F "files=@document.pdf"
+```
+
+**Note**: File uploads are restricted by tier:
+- **Wanderer**: File uploads not available (returns upgrade message)
+- **Builder**: 5MB limit, PDF/TXT/DOCX/PNG formats
+- **Architect**: 20MB limit, PDF/TXT/DOCX/PNG formats  
+- **Awakener**: 50MB limit, PDF/TXT/DOCX/PNG/MP4 formats
 
 V5 Enhanced Response:
 ```json
@@ -675,6 +690,16 @@ Response:
   "upgrade_url": "https://www.firststepai.tech/pricing",
   "current_tier": "wanderer",
   "status": "token_limit_exceeded"
+}
+```
+
+### **File Upload Restriction Response (Wanderer Tier):**
+```json
+{
+  "status": 200,
+  "message": "File uploads not available for Wanderer tier. Please upgrade your plan to upload files",
+  "upgrade_url": "https://www.firststepai.tech/pricing",
+  "current_tier": "wanderer"
 }
 ```
 

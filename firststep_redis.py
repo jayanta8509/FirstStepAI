@@ -173,8 +173,8 @@ class RedisManager:
             return False
 
     # Conversation History Management
-    def store_conversation(self, user_id: str, conversation_data: Dict[str, Any]) -> bool:
-        """Store conversation history"""
+    def store_conversation(self, user_id: str, conversation_data: Dict[str, Any], user_tier: str = "wanderer") -> bool:
+        """Store conversation history with tier-based limits"""
         if not self.is_connected():
             return False
         
@@ -182,17 +182,31 @@ class RedisManager:
         key = f"firststep:conversations:{user_id}"
         
         try:
-            # Add timestamp to conversation data
+            # Add timestamp and thread_id to conversation data
             conversation_data["timestamp"] = timestamp
+            conversation_data["thread_id"] = f"{user_id}_jarvis_convo"
             
             # Store as list with recent conversations first
             self.redis_client.lpush(key, json.dumps(conversation_data))
             
-            # Keep only last 50 conversations
-            self.redis_client.ltrim(key, 0, 49)
+            # Tier-based memory limits
+            tier_limits = {
+                "wanderer": 5,    # Free tier gets basic memory
+                "builder": 5,     # Last 5 chats
+                "architect": 25,  # Last 25 chats  
+                "awakener": -1    # Unlimited
+            }
             
-            # Set expiry for 30 days
-            self.redis_client.expire(key, 30 * 24 * 3600)
+            limit = tier_limits.get(user_tier, 5)
+            
+            if limit > 0:
+                # Keep only the specified number of conversations
+                self.redis_client.ltrim(key, 0, limit - 1)
+            # If limit is -1 (unlimited), don't trim
+            
+            # Set expiry based on tier
+            expiry_days = 90 if user_tier == "awakener" else 30
+            self.redis_client.expire(key, expiry_days * 24 * 3600)
             return True
         except Exception as e:
             print(f"Error storing conversation: {e}")
@@ -210,6 +224,96 @@ class RedisManager:
             return [json.loads(conv) for conv in conversations]
         except Exception as e:
             print(f"Error getting conversation history: {e}")
+            return []
+
+    # Conversation Organization Features
+    def name_conversation(self, user_id: str, conversation_id: str, name: str) -> bool:
+        """Name a conversation for better organization"""
+        if not self.is_connected():
+            return False
+        
+        key = f"firststep:conversation:name:{user_id}:{conversation_id}"
+        
+        try:
+            self.redis_client.setex(key, 90 * 24 * 3600, name)  # 90 days expiry
+            return True
+        except Exception as e:
+            print(f"Error naming conversation: {e}")
+            return False
+
+    def create_conversation_folder(self, user_id: str, folder_name: str, user_tier: str) -> bool:
+        """Create conversation folder (Architect/Awakener only)"""
+        if not self.is_connected():
+            return False
+        
+        # Check if user has folder access
+        if user_tier not in ["architect", "awakener"]:
+            return False
+        
+        key = f"firststep:folders:{user_id}"
+        
+        try:
+            folder_data = {
+                "name": folder_name,
+                "created_at": datetime.now().isoformat(),
+                "conversation_ids": []
+            }
+            
+            # Get existing folders
+            folders = self.redis_client.get(key)
+            if folders:
+                folders_list = json.loads(folders)
+            else:
+                folders_list = []
+            
+            # Add new folder
+            folders_list.append(folder_data)
+            
+            self.redis_client.setex(key, 90 * 24 * 3600, json.dumps(folders_list))
+            return True
+        except Exception as e:
+            print(f"Error creating folder: {e}")
+            return False
+
+    def organize_conversation_to_folder(self, user_id: str, conversation_id: str, folder_name: str) -> bool:
+        """Add conversation to a folder"""
+        if not self.is_connected():
+            return False
+        
+        key = f"firststep:folders:{user_id}"
+        
+        try:
+            folders = self.redis_client.get(key)
+            if not folders:
+                return False
+            
+            folders_list = json.loads(folders)
+            
+            # Find the folder and add conversation
+            for folder in folders_list:
+                if folder["name"] == folder_name:
+                    if conversation_id not in folder["conversation_ids"]:
+                        folder["conversation_ids"].append(conversation_id)
+                    break
+            
+            self.redis_client.setex(key, 90 * 24 * 3600, json.dumps(folders_list))
+            return True
+        except Exception as e:
+            print(f"Error organizing conversation: {e}")
+            return False
+
+    def get_user_folders(self, user_id: str) -> list:
+        """Get user's conversation folders"""
+        if not self.is_connected():
+            return []
+        
+        key = f"firststep:folders:{user_id}"
+        
+        try:
+            folders = self.redis_client.get(key)
+            return json.loads(folders) if folders else []
+        except Exception as e:
+            print(f"Error getting folders: {e}")
             return []
 
     # Crisis Mode Tracking
@@ -398,9 +502,9 @@ def update_teaser_usage(user_id: str) -> bool:
     """Update user's teaser mode usage"""
     return redis_manager.update_teaser_usage(user_id)
 
-def store_conversation(user_id: str, conversation_data: Dict[str, Any]) -> bool:
-    """Store conversation history"""
-    return redis_manager.store_conversation(user_id, conversation_data)
+def store_conversation(user_id: str, conversation_data: Dict[str, Any], user_tier: str = "wanderer") -> bool:
+    """Store conversation history with tier-based limits"""
+    return redis_manager.store_conversation(user_id, conversation_data, user_tier)
 
 def get_conversation_history(user_id: str, limit: int = 10) -> list:
     """Get conversation history"""

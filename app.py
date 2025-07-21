@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import asyncio
 from datetime import datetime, timedelta
 from functools import wraps
 from typing import Dict, Optional
@@ -40,6 +41,9 @@ from prompt_loader import (
     create_unified_optimus_prompt,
     create_unified_elonix_prompt
 )
+from markitdwon import process_any_input
+from file_manager import upload_file
+
 
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -505,27 +509,267 @@ def validate_response_identity(response_content: str) -> str:
 @quart_app.route('/chat', methods=['POST'])
 async def chat():
     try:
-        data = await request.get_json()
-        if not data:
-            raise BadRequest("No JSON data provided")
+        # Check if request contains files (multipart/form-data) or just JSON
+        content_type = request.headers.get('content-type', '')
+        
+        if content_type.startswith('multipart/form-data'):
+            # Handle chat with file uploads
+            return await chat_with_files()
+        else:
+            # Handle regular text-only chat
+            data = await request.get_json()
+            if not data:
+                raise BadRequest("No JSON data provided")
 
-        query = data.get('query')
+            query = data.get('query')
+            if not query:
+                raise BadRequest("Missing required field: query")
+            
+            user_id = data.get('user_id')
+            if not user_id:
+                raise BadRequest("Missing required field: user_id")
+
+            user_tier = data.get('user_tier', 'wanderer')
+            
+            # Crisis detection for emergency override
+            crisis_detected = detect_crisis(query)
+            
+            # Estimate tokens for the query (rough estimation: 1 token ≈ 4 characters)
+            estimated_tokens = max(len(query) // 4, 50)  # Minimum 50 tokens
+            
+            # Token limiting (skip for crisis situations)
+            if not crisis_detected:
+                token_check = check_token_limits(user_id, user_tier, estimated_tokens, crisis_mode=False)
+                if not token_check["allowed"]:
+                    return jsonify({
+                        "error": token_check["error"],
+                        "daily_limit": token_check.get("daily_limit"),
+                        "daily_used": token_check.get("daily_used"),
+                        "remaining": token_check.get("remaining"),
+                        "per_conversation_limit": token_check.get("per_conversation_limit"),
+                        "requested": token_check.get("requested"),
+                        "upgrade_url": token_check.get("upgrade_url", "https://www.firststepai.tech/pricing"),
+                        "current_tier": user_tier,
+                        "status": "token_limit_exceeded"
+                    }), 429
+            else:
+                # Crisis mode token allocation
+                token_check = check_token_limits(user_id, user_tier, estimated_tokens, crisis_mode=True)
+
+            # Use separate memory threads for each user with new format
+            config = {"configurable": {"thread_id": f"{user_id}_jarvis_convo"}}
+            input_messages = [HumanMessage(query)]
+
+            try:
+                output = await app.ainvoke(
+                    {
+                        "messages": input_messages,
+                        "user_tier": user_tier,
+                        "crisis_detected": crisis_detected
+                    },
+                    config
+                )
+            except TimeoutError:
+                return jsonify({"error": "Request timed out", "status": "error"}), 504
+            except Exception as e:
+                return jsonify({"error": f"Error generating response: {str(e)}", "status": "error"}), 500
+
+            # 🔒 V5 ENHANCED SECURITY VALIDATION 🔒
+            raw_response = output["messages"][-1].content
+            response = validate_response_identity(raw_response)  # Apply V5 multi-layer security
+            
+            assistant_name = "Jarvis"  # Always Jarvis for unified brand consistency
+            task_category = output.get("task_category", "business")
+            crisis_detected = output.get("crisis_detected", False)
+            model_used = "FirstStepAI V5 Intelligence Network"  # V5 branded description
+            identity_protected = output.get("identity_protected", False)
+            v5_system_active = output.get("v5_unified_system", True)  # V5 system flag
+
+            # Calculate actual tokens used (rough estimation: 1 token ≈ 4 characters)
+            response_tokens = len(response) // 4
+            total_tokens = estimated_tokens + response_tokens
+            
+            # Get allocated tokens for this assistant
+            assistant_tokens = calculate_assistant_tokens(
+                user_tier, 
+                assistant_name, 
+                token_check["tokens_allocated"], 
+                crisis_detected
+            )
+            
+            # Update token usage (excluding crisis mode)
+            update_token_usage(user_id, total_tokens, crisis_detected)
+
+            # Track analytics in Redis
+            increment_metric("total_requests")
+            increment_metric(f"requests_by_assistant_jarvis")  # Always Jarvis for user-facing
+            increment_metric(f"requests_by_tier_{user_tier}")
+            increment_metric(f"requests_by_category_{task_category}")
+            
+            # Track internal specialist consultation (internal analytics only - never exposed)
+            recommended_specialist = output.get("recommended_specialist", "jarvis")
+            if recommended_specialist.lower() != "jarvis":
+                increment_metric(f"internal_consultation_{recommended_specialist.lower()}")
+            
+            if crisis_detected:
+                increment_metric("crisis_requests")
+                increment_metric(f"crisis_by_tier_{user_tier}")
+
+            # Store conversation history in Redis (V5 enhanced sanitized data)
+            conversation_data = {
+                "query": query,
+                "response": response,
+                "assistant_name": "Jarvis",  # Always Jarvis for unified brand consistency
+                "tokens_used": total_tokens,
+                "crisis_detected": crisis_detected,
+                "user_tier": user_tier,
+                "task_category": task_category,
+                "model_used": model_used,
+                "internal_specialist": recommended_specialist,  # Internal analytics only
+                "identity_protected": identity_protected,
+                "v5_unified_system": v5_system_active,  # V5 system tracking
+                "security_layers_applied": True  # V5 multi-layer security flag
+            }
+            store_conversation(user_id, conversation_data, user_tier)
+
+            # Store interaction data in Supabase
+            response_id = await store_data_supabase(
+                "Jarvis", model_used, response, query, user_id, task_category
+            )
+            
+            # Prepare response with FirstStepAI context and token information (identity protected)
+            api_response = {
+                "response": response,
+                "assistant_name": "Jarvis",  # Always Jarvis for brand consistency
+                "task_category": task_category,
+                "model_used": model_used,
+                "user_tier": user_tier,
+                "crisis_detected": crisis_detected,
+                "status": "success",
+                "status_type": 200,
+                "response_id": response_id,
+                # "soul_points_earned": 10 if not crisis_detected else 50,  # More points for crisis engagement
+                # "token_info": {
+                #     "tokens_used": total_tokens,
+                #     "jarvis_tokens": assistant_tokens,  # Show as Jarvis tokens only
+                #     "mode": token_check.get("mode", "normal"),
+                #     "tokens_allocated": token_check["tokens_allocated"]
+                # },
+                "firststep_ai": {
+                    # "mission": "Guiding 1M entrepreneurs to success",
+                    # "community": "FirstStepAI Entrepreneur Network",
+                    # "mentor": "Jarvis - Your AI CEO and Co-Founder",
+                    "upgrade_available": user_tier != "awakener"
+                }
+            }
+            
+            # Add teaser mode information for wanderer users
+            if user_tier == "wanderer" and token_check.get("mode") == "teaser":
+                api_response["teaser_info"] = {
+                    "teaser_queries_remaining": token_check.get("teaser_queries_remaining", 0),
+                    "message": "You're in teaser mode! Enjoy these enhanced responses before upgrading."
+                }
+            
+            # Add crisis resources if detected
+            if crisis_detected:
+                api_response["emergency_resources"] = {
+                    "crisis_support": "https://www.firststepai.tech/contact",
+                    "emergency_contact": "support@firststepai.tech",
+                    "community_support": "https://www.firststepai.tech/contact",
+                    "message": "We're here to help. You're not alone in this journey."
+                }
+                api_response["tier_override"] = True
+                api_response["status"] = "crisis_detected"
+            
+            return jsonify(api_response), 200
+
+    except BadRequest as e:
+        return jsonify({"error": str(e), "status": "error"}), 400
+    except Exception as e:
+        return jsonify({"error": "An unexpected error occurred", "status": "error"}), 500
+
+async def chat_with_files():
+    """Enhanced chat endpoint that supports file uploads with text queries"""
+    try:
+        # Get form data and files
+        form_data = await request.form
+        files = await request.files
+        
+        # Extract required fields
+        query = form_data.get('query')
+        user_id = form_data.get('user_id')
+        user_tier = form_data.get('user_tier', 'wanderer')
+        
         if not query:
-            raise BadRequest("Missing required field: query")
-        
-        user_id = data.get('user_id')
+            return jsonify({"error": "Missing required field: query", "status": "error"}), 400
         if not user_id:
-            raise BadRequest("Missing required field: user_id")
-
-        user_tier = data.get('user_tier', 'wanderer')
+            return jsonify({"error": "Missing required field: user_id", "status": "error"}), 400
         
-        # Crisis detection for emergency override
+        # Check if wanderer user is trying to upload files
+        if user_tier == 'wanderer' and files:
+            return jsonify({
+                "status": 200,
+                "message": "File uploads not available for Wanderer tier. Please upgrade your plan to upload files",
+                "upgrade_url": "https://www.firststepai.tech/pricing",
+                "current_tier": "wanderer"
+            }), 403
+        
+        # Generate conversation ID
+        conversation_id = f"{user_id}_jarvis_convo"
+        
+        # Process any uploaded files
+        file_context = ""
+        uploaded_files = []
+        
+        if files:
+            print(f"📁 Processing {len(files)} uploaded files...")
+            
+            for file_key in files:
+                file = files[file_key]
+                if file.filename:
+                    try:
+                        # Read file content
+                        filename = file.filename
+                        file_content = file.read()
+                        
+                        # Convert to bytes if needed
+                        if not isinstance(file_content, bytes):
+                            if hasattr(file_content, 'read'):
+                                file_content = file_content.read()
+                            else:
+                                file_content = str(file_content).encode('utf-8') if file_content else b''
+                        
+                        # Process file using existing system
+                        print(f"📄 Processing file: {filename}")
+                        loop = asyncio.get_event_loop()
+                        upload_result = await loop.run_in_executor(
+                            None, upload_file, file_content, filename, user_tier, user_id, conversation_id
+                        )
+                        
+                        if upload_result.get("success"):
+                            file_content_text = upload_result.get("processed_content", "")
+                            file_context += f"\n\n=== UPLOADED FILE: {filename} ===\n{file_content_text}\n"
+                            uploaded_files.append({
+                                "filename": filename,
+                                "file_id": upload_result.get("file_id"),
+                                "size": len(file_content)
+                            })
+                            print(f"✅ File processed: {filename}")
+                        else:
+                            print(f"❌ File processing failed: {filename}")
+                            
+                    except Exception as file_error:
+                        print(f"❌ Error processing file {file.filename}: {file_error}")
+                        continue
+        
+        # Crisis detection
         crisis_detected = detect_crisis(query)
         
-        # Estimate tokens for the query (rough estimation: 1 token ≈ 4 characters)
-        estimated_tokens = max(len(query) // 4, 50)  # Minimum 50 tokens
+        # Estimate tokens
+        total_content = query + file_context
+        estimated_tokens = max(len(total_content) // 4, 50)
         
-        # Token limiting (skip for crisis situations)
+        # Token limiting
         if not crisis_detected:
             token_check = check_token_limits(user_id, user_tier, estimated_tokens, crisis_mode=False)
             if not token_check["allowed"]:
@@ -534,21 +778,24 @@ async def chat():
                     "daily_limit": token_check.get("daily_limit"),
                     "daily_used": token_check.get("daily_used"),
                     "remaining": token_check.get("remaining"),
-                    "per_conversation_limit": token_check.get("per_conversation_limit"),
-                    "requested": token_check.get("requested"),
                     "upgrade_url": token_check.get("upgrade_url", "https://www.firststepai.tech/pricing"),
                     "current_tier": user_tier,
                     "status": "token_limit_exceeded"
                 }), 429
         else:
-            # Crisis mode token allocation
             token_check = check_token_limits(user_id, user_tier, estimated_tokens, crisis_mode=True)
 
-        # Use separate memory threads for each user
-        config = {"configurable": {"thread_id": f"{user_id}_conversation"}}
-        input_messages = [HumanMessage(query)]
+        # Enhance query with file context
+        enhanced_query = query
+        if file_context:
+            enhanced_query = f"{query}\n\n--- FILE CONTEXT ---{file_context}\n\nBased on the uploaded files above, please respond to: {query}"
+        
+        # Use memory threads
+        config = {"configurable": {"thread_id": f"{user_id}_jarvis_convo"}}
+        input_messages = [HumanMessage(enhanced_query)]
 
         try:
+            # Use the same routing system as regular chat for file uploads
             output = await app.ainvoke(
                 {
                     "messages": input_messages,
@@ -562,73 +809,59 @@ async def chat():
         except Exception as e:
             return jsonify({"error": f"Error generating response: {str(e)}", "status": "error"}), 500
 
-        # 🔒 V5 ENHANCED SECURITY VALIDATION 🔒
+        # Process response
         raw_response = output["messages"][-1].content
-        response = validate_response_identity(raw_response)  # Apply V5 multi-layer security
+        response = validate_response_identity(raw_response)
         
-        assistant_name = "Jarvis"  # Always Jarvis for unified brand consistency
+        assistant_name = "Jarvis"
         task_category = output.get("task_category", "business")
         crisis_detected = output.get("crisis_detected", False)
-        model_used = "FirstStepAI V5 Intelligence Network"  # V5 branded description
-        identity_protected = output.get("identity_protected", False)
-        v5_system_active = output.get("v5_unified_system", True)  # V5 system flag
+        model_used = "FirstStepAI V5 Intelligence Network"
 
-        # Calculate actual tokens used (rough estimation: 1 token ≈ 4 characters)
+        # Calculate tokens
         response_tokens = len(response) // 4
         total_tokens = estimated_tokens + response_tokens
+        assistant_tokens = calculate_assistant_tokens(user_tier, assistant_name, token_check["tokens_allocated"], crisis_detected)
         
-        # Get allocated tokens for this assistant
-        assistant_tokens = calculate_assistant_tokens(
-            user_tier, 
-            assistant_name, 
-            token_check["tokens_allocated"], 
-            crisis_detected
-        )
-        
-        # Update token usage (excluding crisis mode)
+        # Update token usage
         update_token_usage(user_id, total_tokens, crisis_detected)
 
-        # Track analytics in Redis
+        # Track analytics
         increment_metric("total_requests")
-        increment_metric(f"requests_by_assistant_jarvis")  # Always Jarvis for user-facing
+        increment_metric(f"requests_by_assistant_jarvis")
         increment_metric(f"requests_by_tier_{user_tier}")
-        increment_metric(f"requests_by_category_{task_category}")
-        
-        # Track internal specialist consultation (internal analytics only - never exposed)
-        recommended_specialist = output.get("recommended_specialist", "jarvis")
-        if recommended_specialist.lower() != "jarvis":
-            increment_metric(f"internal_consultation_{recommended_specialist.lower()}")
+        if uploaded_files:
+            increment_metric("requests_with_files")
+            increment_metric(f"files_uploaded_tier_{user_tier}")
         
         if crisis_detected:
             increment_metric("crisis_requests")
-            increment_metric(f"crisis_by_tier_{user_tier}")
 
-        # Store conversation history in Redis (V5 enhanced sanitized data)
+        # Store conversation
         conversation_data = {
             "query": query,
             "response": response,
-            "assistant_name": "Jarvis",  # Always Jarvis for unified brand consistency
+            "assistant_name": "Jarvis",
             "tokens_used": total_tokens,
             "crisis_detected": crisis_detected,
             "user_tier": user_tier,
             "task_category": task_category,
             "model_used": model_used,
-            "internal_specialist": recommended_specialist,  # Internal analytics only
-            "identity_protected": identity_protected,
-            "v5_unified_system": v5_system_active,  # V5 system tracking
-            "security_layers_applied": True  # V5 multi-layer security flag
+            "files_included": uploaded_files,
+            "file_context_length": len(file_context),
+            "enhanced_query": len(enhanced_query) > len(query)
         }
-        store_conversation(user_id, conversation_data)
+        store_conversation(user_id, conversation_data, user_tier)
 
-        # Store interaction data in Supabase
+        # Store in Supabase
         response_id = await store_data_supabase(
-            "Jarvis", model_used, response, query, user_id, task_category
+            "Jarvis", model_used, response, enhanced_query, user_id, task_category
         )
         
-        # Prepare response with FirstStepAI context and token information (identity protected)
+        # Prepare response
         api_response = {
             "response": response,
-            "assistant_name": "Jarvis",  # Always Jarvis for brand consistency
+            "assistant_name": "Jarvis",
             "task_category": task_category,
             "model_used": model_used,
             "user_tier": user_tier,
@@ -636,20 +869,22 @@ async def chat():
             "status": "success",
             "status_type": 200,
             "response_id": response_id,
-            "soul_points_earned": 10 if not crisis_detected else 50,  # More points for crisis engagement
-            "token_info": {
-                "tokens_used": total_tokens,
-                "jarvis_tokens": assistant_tokens,  # Show as Jarvis tokens only
-                "mode": token_check.get("mode", "normal"),
-                "tokens_allocated": token_check["tokens_allocated"]
-            },
+            # "token_info": {
+            #     "tokens_used": total_tokens,
+            #     "jarvis_tokens": assistant_tokens,
+            #     "mode": token_check.get("mode", "normal"),
+            #     "tokens_allocated": token_check["tokens_allocated"]
+            # },
             "firststep_ai": {
-                "mission": "Guiding 1M entrepreneurs to success",
-                "community": "FirstStepAI Entrepreneur Network",
-                "mentor": "Jarvis - Your AI CEO and Co-Founder",
+                # "mission": "Guiding 1M entrepreneurs to success",
+                # "community": "FirstStepAI Entrepreneur Network", 
+                # "mentor": "Jarvis - Your AI CEO and Co-Founder",
                 "upgrade_available": user_tier != "awakener"
             }
         }
+        
+        if uploaded_files:
+            api_response["file_analysis"] = f"Analyzed {len(uploaded_files)} files and integrated content into response"
         
         # Add teaser mode information for wanderer users
         if user_tier == "wanderer" and token_check.get("mode") == "teaser":
@@ -658,7 +893,7 @@ async def chat():
                 "message": "You're in teaser mode! Enjoy these enhanced responses before upgrading."
             }
         
-        # Add crisis resources if detected
+        # Add crisis resources if detected (same as regular chat)
         if crisis_detected:
             api_response["emergency_resources"] = {
                 "crisis_support": "https://www.firststepai.tech/contact",
@@ -670,11 +905,9 @@ async def chat():
             api_response["status"] = "crisis_detected"
         
         return jsonify(api_response), 200
-
-    except BadRequest as e:
-        return jsonify({"error": str(e), "status": "error"}), 400
+        
     except Exception as e:
-        return jsonify({"error": "An unexpected error occurred", "status": "error"}), 500
+        return jsonify({"error": f"Chat with files failed: {str(e)}", "status": "error"}), 500
 
 
 @quart_app.route('/redis/health', methods=['GET'])
