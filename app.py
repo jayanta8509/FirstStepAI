@@ -708,8 +708,9 @@ async def chat_with_files():
         # Check if wanderer user is trying to upload files
         if user_tier == 'wanderer' and files:
             return jsonify({
-                "status": 200,
-                "message": "File uploads not available for Wanderer tier. Please upgrade your plan to upload files",
+                "status": "error",
+                "status_type": 403,
+                "response": "File uploads not available for Wanderer tier. Please upgrade your plan to upload files",
                 "upgrade_url": "https://www.firststepai.tech/pricing",
                 "current_tier": "wanderer"
             }), 403
