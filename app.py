@@ -33,7 +33,10 @@ from firststep_redis import (
     update_teaser_usage,
     store_conversation,
     increment_metric,
-    redis_health_check
+    redis_health_check,
+    store_user_profile,
+    get_user_profile,
+    update_user_profile_field
 )
 from prompt_loader import (
     create_unified_jarvis_prompt,
@@ -42,7 +45,7 @@ from prompt_loader import (
     create_unified_elonix_prompt
 )
 from markitdwon import process_any_input
-from file_manager import upload_file
+from file_manager import upload_file, upload_file_async
 
 
 load_dotenv()
@@ -245,6 +248,7 @@ class State(TypedDict):
     assistant_name: str
     task_category: str
     user_tier: str
+    user_profile: dict
     crisis_detected: bool
 
 # V5 Unified Prompt System - Now loaded from YAML configurations
@@ -264,6 +268,7 @@ async def route_to_assistant(state: State):
     Routes to exactly ONE specialist based on classification using unified prompts."""
     latest_message = state["messages"][-1].content
     user_tier = state.get("user_tier", "wanderer")
+    user_profile = state.get("user_profile", {})
     
     try:
         # Use enhanced classifier to determine optimal specialist
@@ -283,7 +288,7 @@ async def route_to_assistant(state: State):
         if recommended_specialist.lower() == "celine":
             # Creative consultation using unified prompt
             try:
-                celine_unified_prompt = create_unified_celine_prompt(user_tier)
+                celine_unified_prompt = create_unified_celine_prompt(user_tier, user_profile)
                 celine_analysis = celine_unified_prompt.invoke(state)
                 celine_insight = await celine_model.ainvoke(celine_analysis)
                 specialist_insights.append(f"Creative Strategy Analysis: {celine_insight.content}")
@@ -301,7 +306,7 @@ async def route_to_assistant(state: State):
         elif recommended_specialist.lower() == "optimus":
             # Technical consultation using unified prompt
             try:
-                optimus_unified_prompt = create_unified_optimus_prompt(user_tier)
+                optimus_unified_prompt = create_unified_optimus_prompt(user_tier, user_profile)
                 optimus_analysis = optimus_unified_prompt.invoke(state)
                 optimus_insight = await optimus_model.ainvoke(optimus_analysis)
                 specialist_insights.append(f"Technical Architecture Analysis: {optimus_insight.content}")
@@ -319,7 +324,7 @@ async def route_to_assistant(state: State):
         elif recommended_specialist.lower() == "elonix":
             # Social intelligence consultation using unified prompt
             try:
-                elonix_unified_prompt = create_unified_elonix_prompt(user_tier)
+                elonix_unified_prompt = create_unified_elonix_prompt(user_tier, user_profile)
                 elonix_analysis = elonix_unified_prompt.invoke(state)
                 elonix_insight = await elonix_model.ainvoke(elonix_analysis)
                 specialist_insights.append(f"Social Intelligence Analysis: {elonix_insight.content}")
@@ -336,7 +341,7 @@ async def route_to_assistant(state: State):
 
         # 🎯 V5 JARVIS UNIFIED RESPONSE SYNTHESIS
         # Use tier-adapted Jarvis prompt to synthesize specialist insights
-        jarvis_unified_prompt = create_unified_jarvis_prompt(user_tier)
+        jarvis_unified_prompt = create_unified_jarvis_prompt(user_tier, user_profile)
         
         # Create enhanced context with specialist insights
         enhanced_messages = state["messages"].copy()
@@ -354,7 +359,7 @@ async def route_to_assistant(state: State):
     except Exception as e:
         # V5 Enhanced Fallback - Use tier-adapted Jarvis prompt
         print(f"V5 System Error - Using tier-adapted fallback: {e}")
-        jarvis_unified_prompt = create_unified_jarvis_prompt(user_tier)
+        jarvis_unified_prompt = create_unified_jarvis_prompt(user_tier, user_profile)
         jarvis_analysis = jarvis_unified_prompt.invoke(state)
         response = await jarvis_model.ainvoke(jarvis_analysis)
         recommended_specialist = "jarvis"
@@ -412,6 +417,46 @@ workflow.add_edge(START, "route_to_assistant")
 # Initialize memory for each assistant
 memory = MemorySaver()
 app = workflow.compile(checkpointer=memory)
+
+def extract_and_store_user_profile(data: dict, user_id: str) -> dict:
+    """Extract user profile information from request and store in Redis
+    
+    Args:
+        data: Request data dictionary
+        user_id: User identifier
+        
+    Returns:
+        Dict containing the user profile information
+    """
+    # Define profile fields to extract
+    profile_fields = [
+        'nickname', 
+        'life_goal', 
+        'business_vision', 
+        'preferred_tone', 
+        'preferred_language'
+    ]
+    
+    # Extract profile data from request
+    new_profile_data = {}
+    for field in profile_fields:
+        value = data.get(field)
+        if value and isinstance(value, str) and value.strip():
+            # Clean and validate the field
+            cleaned_value = value.strip()[:500]  # Limit length to 500 chars
+            new_profile_data[field] = cleaned_value
+    
+    # Get existing profile and merge with new data
+    existing_profile = get_user_profile(user_id) or {}
+    
+    # Store updated profile in Redis if we have new data
+    if new_profile_data:
+        store_user_profile(user_id, new_profile_data)
+        
+        # Merge for current use
+        existing_profile.update(new_profile_data)
+    
+    return existing_profile
 
 def validate_response_identity(response_content: str) -> str:
     """🔒 V5 ENHANCED MULTI-LAYER SECURITY VALIDATION 🔒
@@ -531,6 +576,9 @@ async def chat():
 
             user_tier = data.get('user_tier', 'wanderer')
             
+            # Extract and store user profile information
+            user_profile = extract_and_store_user_profile(data, user_id)
+            
             # Crisis detection for emergency override
             crisis_detected = detect_crisis(query)
             
@@ -565,6 +613,7 @@ async def chat():
                     {
                         "messages": input_messages,
                         "user_tier": user_tier,
+                        "user_profile": user_profile,
                         "crisis_detected": crisis_detected
                     },
                     config
@@ -628,7 +677,9 @@ async def chat():
                 "internal_specialist": recommended_specialist,  # Internal analytics only
                 "identity_protected": identity_protected,
                 "v5_unified_system": v5_system_active,  # V5 system tracking
-                "security_layers_applied": True  # V5 multi-layer security flag
+                "security_layers_applied": True,  # V5 multi-layer security flag
+                "user_profile_used": bool(user_profile),  # Track if profile was used
+                "profile_fields": list(user_profile.keys()) if user_profile else []  # Track which fields were available
             }
             store_conversation(user_id, conversation_data, user_tier)
 
@@ -700,6 +751,17 @@ async def chat_with_files():
         user_id = form_data.get('user_id')
         user_tier = form_data.get('user_tier', 'wanderer')
         
+        # Extract profile information from form data (convert to dict format)
+        profile_data = {}
+        profile_fields = ['nickname', 'life_goal', 'business_vision', 'preferred_tone', 'preferred_language']
+        for field in profile_fields:
+            value = form_data.get(field)
+            if value:
+                profile_data[field] = value
+        
+        # Extract and store user profile information
+        user_profile = extract_and_store_user_profile(profile_data, user_id)
+        
         if not query:
             return jsonify({"error": "Missing required field: query", "status": "error"}), 400
         if not user_id:
@@ -740,11 +802,10 @@ async def chat_with_files():
                             else:
                                 file_content = str(file_content).encode('utf-8') if file_content else b''
                         
-                        # Process file using existing system
+                        # Process file using existing system (async to prevent blocking)
                         print(f"📄 Processing file: {filename}")
-                        loop = asyncio.get_event_loop()
-                        upload_result = await loop.run_in_executor(
-                            None, upload_file, file_content, filename, user_tier, user_id, conversation_id
+                        upload_result = await upload_file_async(
+                            file_content, filename, user_tier, user_id, conversation_id
                         )
                         
                         if upload_result.get("success"):
@@ -766,9 +827,18 @@ async def chat_with_files():
         # Crisis detection
         crisis_detected = detect_crisis(query)
         
-        # Estimate tokens
-        total_content = query + file_context
-        estimated_tokens = max(len(total_content) // 4, 50)
+        # Estimate tokens (reasonable estimation for file uploads)
+        # Don't count full file content - use base query + reasonable file overhead
+        base_query_tokens = max(len(query) // 4, 50)
+        
+        if file_context:
+            # For file uploads: base query + reasonable file processing overhead
+            # File content is context, not main token usage
+            file_overhead = min(200, len(file_context) // 10)  # Max 200 tokens for file overhead
+            estimated_tokens = base_query_tokens + file_overhead
+            print(f"📊 Token estimation: Query={base_query_tokens}, File overhead={file_overhead}, Total={estimated_tokens}")
+        else:
+            estimated_tokens = base_query_tokens
         
         # Token limiting
         if not crisis_detected:
@@ -801,6 +871,7 @@ async def chat_with_files():
                 {
                     "messages": input_messages,
                     "user_tier": user_tier,
+                    "user_profile": user_profile,
                     "crisis_detected": crisis_detected
                 },
                 config
@@ -850,7 +921,9 @@ async def chat_with_files():
             "model_used": model_used,
             "files_included": uploaded_files,
             "file_context_length": len(file_context),
-            "enhanced_query": len(enhanced_query) > len(query)
+            "enhanced_query": len(enhanced_query) > len(query),
+            "user_profile_used": bool(user_profile),  # Track if profile was used
+            "profile_fields": list(user_profile.keys()) if user_profile else []  # Track which fields were available
         }
         store_conversation(user_id, conversation_data, user_tier)
 

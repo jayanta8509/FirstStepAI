@@ -5,7 +5,7 @@ Handles loading YAML prompt configurations and creating unified prompt templates
 
 import os
 import yaml
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 class PromptLoader:
@@ -44,19 +44,50 @@ class PromptLoader:
         except yaml.YAMLError as e:
             raise ValueError(f"Error parsing YAML file {file_path}: {e}")
     
-    def create_jarvis_prompt(self, user_tier: str = "wanderer") -> ChatPromptTemplate:
-        """Create unified Jarvis prompt for specified tier
+    def create_jarvis_prompt(
+        self, 
+        user_tier: str = "wanderer", 
+        user_profile: Dict[str, Any] = None
+    ) -> ChatPromptTemplate:
+        """Create unified Jarvis prompt for specified tier with user profile
         
         Args:
             user_tier: User subscription tier (wanderer, builder, architect, awakener)
+            user_profile: Optional user profile containing nickname, life_goal, etc.
             
         Returns:
-            ChatPromptTemplate configured for the specified tier
+            ChatPromptTemplate configured for the specified tier and user
         """
         config = self.load_yaml_config("jarvis")
         tier_config = config["tiers"].get(user_tier, config["tiers"]["wanderer"])
         
-        # Format the system prompt with tier-specific values
+        # Extract profile information with defaults
+        profile = user_profile or {}
+        nickname = profile.get("nickname", "")
+        life_goal = profile.get("life_goal", "")
+        business_vision = profile.get("business_vision", "")
+        preferred_tone = profile.get("preferred_tone", "professional")
+        preferred_language = profile.get("preferred_language", "English")
+        
+        # Create personalization context
+        personalization = ""
+        if nickname:
+            personalization += f"USER'S PREFERRED NAME: {nickname}\n"
+        if life_goal:
+            personalization += f"USER'S LIFE GOAL: {life_goal}\n"
+        if business_vision:
+            personalization += f"USER'S BUSINESS VISION: {business_vision}\n"
+        if preferred_tone and preferred_tone != "professional":
+            personalization += f"PREFERRED COMMUNICATION TONE: {preferred_tone}\n"
+        
+        # CRITICAL: Always enforce language preference
+        if preferred_language:
+            personalization += f"🌍 LANGUAGE REQUIREMENT: You MUST respond ONLY in {preferred_language}. Do NOT use any other language.\n"
+        
+        if personalization:
+            personalization = f"\n🎯 PERSONALIZATION CONTEXT:\n{personalization}"
+        
+        # Format the system prompt with tier-specific and profile values
         system_prompt = config["system_prompt"].format(
             user_tier=user_tier.upper(),
             tier_price=tier_config["price"],
@@ -66,7 +97,8 @@ class PromptLoader:
             soul_points=tier_config["soul_points"],
             approach=tier_config["approach"],
             guidance_style=tier_config["guidance_style"],
-            framework_level=tier_config["framework_level"]
+            framework_level=tier_config["framework_level"],
+            personalization=personalization
         )
         
         return ChatPromptTemplate.from_messages([
@@ -74,23 +106,55 @@ class PromptLoader:
             MessagesPlaceholder(variable_name="messages"),
         ])
     
-    def create_celine_prompt(self, user_tier: str = "wanderer") -> ChatPromptTemplate:
-        """Create unified Celine prompt for specified tier
+    def create_celine_prompt(
+        self, 
+        user_tier: str = "wanderer", 
+        user_profile: Dict[str, Any] = None
+    ) -> ChatPromptTemplate:
+        """Create unified Celine prompt for specified tier with user profile
         
         Args:
             user_tier: User subscription tier
+            user_profile: Optional user profile containing nickname, life_goal, etc.
             
         Returns:
-            ChatPromptTemplate configured for the specified tier
+            ChatPromptTemplate configured for the specified tier and user
         """
         config = self.load_yaml_config("celine")
         tier_config = config["tiers"].get(user_tier, config["tiers"]["wanderer"])
         
-        # Format the system prompt with tier-specific values
+        # Extract profile information with defaults
+        profile = user_profile or {}
+        nickname = profile.get("nickname", "")
+        life_goal = profile.get("life_goal", "")
+        business_vision = profile.get("business_vision", "")
+        preferred_tone = profile.get("preferred_tone", "professional")
+        preferred_language = profile.get("preferred_language", "English")
+        
+        # Create personalization context
+        personalization = ""
+        if nickname:
+            personalization += f"USER'S PREFERRED NAME: {nickname}\n"
+        if life_goal:
+            personalization += f"USER'S LIFE GOAL: {life_goal}\n"
+        if business_vision:
+            personalization += f"USER'S BUSINESS VISION: {business_vision}\n"
+        if preferred_tone and preferred_tone != "professional":
+            personalization += f"PREFERRED COMMUNICATION TONE: {preferred_tone}\n"
+        
+        # CRITICAL: Always enforce language preference
+        if preferred_language:
+            personalization += f"🌍 LANGUAGE REQUIREMENT: You MUST respond ONLY in {preferred_language}. Do NOT use any other language.\n"
+        
+        if personalization:
+            personalization = f"\n🎯 PERSONALIZATION CONTEXT:\n{personalization}"
+        
+        # Format the system prompt with tier-specific and profile values
         system_prompt = config["system_prompt"].format(
             user_tier=user_tier.upper(),
             tier_approach=tier_config["approach"],
-            output_requirement=tier_config["output_requirement"]
+            output_requirement=tier_config["output_requirement"],
+            personalization=personalization
         )
         
         return ChatPromptTemplate.from_messages([
@@ -98,23 +162,55 @@ class PromptLoader:
             MessagesPlaceholder(variable_name="messages"),
         ])
     
-    def create_optimus_prompt(self, user_tier: str = "wanderer") -> ChatPromptTemplate:
-        """Create unified Optimus prompt for specified tier
+    def create_optimus_prompt(
+        self, 
+        user_tier: str = "wanderer", 
+        user_profile: Dict[str, Any] = None
+    ) -> ChatPromptTemplate:
+        """Create unified Optimus prompt for specified tier with user profile
         
         Args:
             user_tier: User subscription tier
+            user_profile: Optional user profile containing nickname, life_goal, etc.
             
         Returns:
-            ChatPromptTemplate configured for the specified tier
+            ChatPromptTemplate configured for the specified tier and user
         """
         config = self.load_yaml_config("optimus")
         tier_config = config["tiers"].get(user_tier, config["tiers"]["wanderer"])
         
-        # Format the system prompt with tier-specific values
+        # Extract profile information with defaults
+        profile = user_profile or {}
+        nickname = profile.get("nickname", "")
+        life_goal = profile.get("life_goal", "")
+        business_vision = profile.get("business_vision", "")
+        preferred_tone = profile.get("preferred_tone", "professional")
+        preferred_language = profile.get("preferred_language", "English")
+        
+        # Create personalization context
+        personalization = ""
+        if nickname:
+            personalization += f"USER'S PREFERRED NAME: {nickname}\n"
+        if life_goal:
+            personalization += f"USER'S LIFE GOAL: {life_goal}\n"
+        if business_vision:
+            personalization += f"USER'S BUSINESS VISION: {business_vision}\n"
+        if preferred_tone and preferred_tone != "professional":
+            personalization += f"PREFERRED COMMUNICATION TONE: {preferred_tone}\n"
+        
+        # CRITICAL: Always enforce language preference
+        if preferred_language:
+            personalization += f"🌍 LANGUAGE REQUIREMENT: You MUST respond ONLY in {preferred_language}. Do NOT use any other language.\n"
+        
+        if personalization:
+            personalization = f"\n🎯 PERSONALIZATION CONTEXT:\n{personalization}"
+        
+        # Format the system prompt with tier-specific and profile values
         system_prompt = config["system_prompt"].format(
             user_tier=user_tier.upper(),
             tier_approach=tier_config["approach"],
-            output_requirement=tier_config["output_requirement"]
+            output_requirement=tier_config["output_requirement"],
+            personalization=personalization
         )
         
         return ChatPromptTemplate.from_messages([
@@ -122,23 +218,55 @@ class PromptLoader:
             MessagesPlaceholder(variable_name="messages"),
         ])
     
-    def create_elonix_prompt(self, user_tier: str = "wanderer") -> ChatPromptTemplate:
-        """Create unified Elonix prompt for specified tier
+    def create_elonix_prompt(
+        self, 
+        user_tier: str = "wanderer", 
+        user_profile: Dict[str, Any] = None
+    ) -> ChatPromptTemplate:
+        """Create unified Elonix prompt for specified tier with user profile
         
         Args:
             user_tier: User subscription tier
+            user_profile: Optional user profile containing nickname, life_goal, etc.
             
         Returns:
-            ChatPromptTemplate configured for the specified tier
+            ChatPromptTemplate configured for the specified tier and user
         """
         config = self.load_yaml_config("elonix")
         tier_config = config["tiers"].get(user_tier, config["tiers"]["wanderer"])
         
-        # Format the system prompt with tier-specific values
+        # Extract profile information with defaults
+        profile = user_profile or {}
+        nickname = profile.get("nickname", "")
+        life_goal = profile.get("life_goal", "")
+        business_vision = profile.get("business_vision", "")
+        preferred_tone = profile.get("preferred_tone", "professional")
+        preferred_language = profile.get("preferred_language", "English")
+        
+        # Create personalization context
+        personalization = ""
+        if nickname:
+            personalization += f"USER'S PREFERRED NAME: {nickname}\n"
+        if life_goal:
+            personalization += f"USER'S LIFE GOAL: {life_goal}\n"
+        if business_vision:
+            personalization += f"USER'S BUSINESS VISION: {business_vision}\n"
+        if preferred_tone and preferred_tone != "professional":
+            personalization += f"PREFERRED COMMUNICATION TONE: {preferred_tone}\n"
+        
+        # CRITICAL: Always enforce language preference
+        if preferred_language:
+            personalization += f"🌍 LANGUAGE REQUIREMENT: You MUST respond ONLY in {preferred_language}. Do NOT use any other language.\n"
+        
+        if personalization:
+            personalization = f"\n🎯 PERSONALIZATION CONTEXT:\n{personalization}"
+        
+        # Format the system prompt with tier-specific and profile values
         system_prompt = config["system_prompt"].format(
             user_tier=user_tier.upper(),
             tier_approach=tier_config["approach"],
-            output_requirement=tier_config["output_requirement"]
+            output_requirement=tier_config["output_requirement"],
+            personalization=personalization
         )
         
         return ChatPromptTemplate.from_messages([
@@ -214,21 +342,33 @@ class PromptLoader:
 prompt_loader = PromptLoader()
 
 # Convenience functions for backward compatibility
-def create_unified_jarvis_prompt(user_tier: str = "wanderer") -> ChatPromptTemplate:
-    """Create unified Jarvis prompt - V5 YAML-based system"""
-    return prompt_loader.create_jarvis_prompt(user_tier)
+def create_unified_jarvis_prompt(
+    user_tier: str = "wanderer", 
+    user_profile: Dict[str, Any] = None
+) -> ChatPromptTemplate:
+    """Create unified Jarvis prompt - V5 YAML-based system with user profile support"""
+    return prompt_loader.create_jarvis_prompt(user_tier, user_profile)
 
-def create_unified_celine_prompt(user_tier: str = "wanderer") -> ChatPromptTemplate:
-    """Create unified Celine prompt - V5 YAML-based system"""
-    return prompt_loader.create_celine_prompt(user_tier)
+def create_unified_celine_prompt(
+    user_tier: str = "wanderer", 
+    user_profile: Dict[str, Any] = None
+) -> ChatPromptTemplate:
+    """Create unified Celine prompt - V5 YAML-based system with user profile support"""
+    return prompt_loader.create_celine_prompt(user_tier, user_profile)
 
-def create_unified_optimus_prompt(user_tier: str = "wanderer") -> ChatPromptTemplate:
-    """Create unified Optimus prompt - V5 YAML-based system"""
-    return prompt_loader.create_optimus_prompt(user_tier)
+def create_unified_optimus_prompt(
+    user_tier: str = "wanderer", 
+    user_profile: Dict[str, Any] = None
+) -> ChatPromptTemplate:
+    """Create unified Optimus prompt - V5 YAML-based system with user profile support"""
+    return prompt_loader.create_optimus_prompt(user_tier, user_profile)
 
-def create_unified_elonix_prompt(user_tier: str = "wanderer") -> ChatPromptTemplate:
-    """Create unified Elonix prompt - V5 YAML-based system"""
-    return prompt_loader.create_elonix_prompt(user_tier)
+def create_unified_elonix_prompt(
+    user_tier: str = "wanderer", 
+    user_profile: Dict[str, Any] = None
+) -> ChatPromptTemplate:
+    """Create unified Elonix prompt - V5 YAML-based system with user profile support"""
+    return prompt_loader.create_elonix_prompt(user_tier, user_profile)
 
 def create_classifier_prompt(
     user_tier: str = "wanderer",

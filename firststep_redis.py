@@ -438,6 +438,125 @@ class RedisManager:
             print(f"Error clearing cache: {e}")
             return False
 
+    # User Profile Management Functions
+    def store_user_profile(self, user_id: str, profile_data: Dict[str, Any]) -> bool:
+        """Store or update user profile information
+        
+        Args:
+            user_id: Unique user identifier
+            profile_data: Dictionary containing profile fields (nickname, life_goal, etc.)
+            
+        Returns:
+            bool: Success status
+        """
+        if not self.is_connected():
+            return False
+            
+        try:
+            profile_key = f"firststep:profile:{user_id}"
+            
+            # Get existing profile if any
+            existing_profile = self.get_user_profile(user_id)
+            
+            # Merge with new data (new data takes precedence)
+            if existing_profile:
+                existing_profile.update(profile_data)
+                merged_profile = existing_profile
+            else:
+                merged_profile = profile_data.copy()
+            
+            # Add metadata
+            merged_profile["last_updated"] = datetime.utcnow().isoformat()
+            merged_profile["user_id"] = user_id
+            
+            # Store with 30-day expiration
+            self.redis_client.setex(
+                profile_key, 
+                timedelta(days=30), 
+                json.dumps(merged_profile)
+            )
+            
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error storing user profile: {e}")
+            return False
+    
+    def get_user_profile(self, user_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieve user profile information
+        
+        Args:
+            user_id: Unique user identifier
+            
+        Returns:
+            Dict containing profile data or None if not found
+        """
+        if not self.is_connected():
+            return None
+            
+        try:
+            profile_key = f"firststep:profile:{user_id}"
+            profile_data = self.redis_client.get(profile_key)
+            
+            if profile_data:
+                return json.loads(profile_data)
+            return None
+            
+        except Exception as e:
+            print(f"❌ Error retrieving user profile: {e}")
+            return None
+    
+    def update_user_profile_field(self, user_id: str, field: str, value: Any) -> bool:
+        """Update a specific field in user profile
+        
+        Args:
+            user_id: Unique user identifier
+            field: Profile field to update
+            value: New value for the field
+            
+        Returns:
+            bool: Success status
+        """
+        if not self.is_connected():
+            return False
+            
+        try:
+            # Get existing profile
+            profile = self.get_user_profile(user_id)
+            if not profile:
+                profile = {}
+            
+            # Update specific field
+            profile[field] = value
+            
+            # Store updated profile
+            return self.store_user_profile(user_id, profile)
+            
+        except Exception as e:
+            print(f"❌ Error updating user profile field: {e}")
+            return False
+    
+    def delete_user_profile(self, user_id: str) -> bool:
+        """Delete user profile
+        
+        Args:
+            user_id: Unique user identifier
+            
+        Returns:
+            bool: Success status
+        """
+        if not self.is_connected():
+            return False
+            
+        try:
+            profile_key = f"firststep:profile:{user_id}"
+            self.redis_client.delete(profile_key)
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error deleting user profile: {e}")
+            return False
+
     # Utility Functions
     def health_check(self) -> Dict[str, Any]:
         """Perform Redis health check"""
@@ -524,4 +643,21 @@ def increment_metric(metric_name: str, value: int = 1) -> bool:
 
 def redis_health_check() -> Dict[str, Any]:
     """Redis health check"""
-    return redis_manager.health_check() 
+    return redis_manager.health_check()
+
+# User Profile Management Functions
+def store_user_profile(user_id: str, profile_data: Dict[str, Any]) -> bool:
+    """Store or update user profile information"""
+    return redis_manager.store_user_profile(user_id, profile_data)
+
+def get_user_profile(user_id: str) -> Optional[Dict[str, Any]]:
+    """Retrieve user profile information"""
+    return redis_manager.get_user_profile(user_id)
+
+def update_user_profile_field(user_id: str, field: str, value: Any) -> bool:
+    """Update a specific field in user profile"""
+    return redis_manager.update_user_profile_field(user_id, field, value)
+
+def delete_user_profile(user_id: str) -> bool:
+    """Delete user profile"""
+    return redis_manager.delete_user_profile(user_id) 
