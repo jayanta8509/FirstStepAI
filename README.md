@@ -236,6 +236,110 @@ firststep:cache:{cache_key}                 # General caching
 - ✅ **Health monitoring** - Redis status tracking
 - ✅ **Enterprise reliability** - 99.9% uptime SLA
 
+## 👤 **User Profile Integration & Personalization**
+
+### **Personalized AI Responses**
+FirstStepAI V5 now features advanced user profile integration for truly personalized entrepreneurial guidance:
+
+#### **📝 Profile Fields**
+- **`nickname`**: Personalized greetings and references
+- **`life_goal`**: Long-term aspirations for strategic alignment  
+- **`business_vision`**: Specific business objectives for targeted advice
+- **`preferred_tone`**: Communication style adaptation (professional, casual, direct, motivational)
+- **`preferred_language`**: Strict language enforcement for global accessibility
+
+#### **🤖 Personalization in Action**
+
+**Without Profile:**
+```
+"Here's a business strategy framework for your startup..."
+```
+
+**With Profile (nickname: "Roy", business_vision: "AI empire", preferred_tone: "direct"):**
+```
+"Roy, building your AI empire requires strategic thinking. Here's your direct action plan..."
+```
+
+#### **🌍 Language Support**
+- **Strict Enforcement**: When `preferred_language` is specified, ALL responses are in that language
+- **Global Support**: Works with any language (English, Spanish, French, Hindi, Chinese, Arabic, etc.)
+- **Consistent Experience**: Language preference maintained across conversation history
+
+#### **💾 Profile Storage**
+- **Redis Integration**: Profile data stored in Redis with 30-day expiration
+- **Automatic Merging**: New profile fields update existing data
+- **Privacy Focused**: Profile data tied to user_id with automatic cleanup
+
+#### **🔄 Profile Updates**
+```json
+// First request - creates profile
+{
+  "query": "Help me with business strategy",
+  "user_id": "entrepreneur_123",
+  "nickname": "Roy",
+  "business_vision": "AI startup"
+}
+
+// Later request - updates profile
+{
+  "query": "What about marketing?", 
+  "user_id": "entrepreneur_123",
+  "preferred_language": "Spanish"
+  // Merges with existing: nickname="Roy", business_vision="AI startup"
+}
+```
+
+## 📁 **Enhanced File Upload System**
+
+### **V5 File Upload Improvements**
+Recent updates have significantly improved the file upload experience with better performance and error handling:
+
+#### **🔧 Key Improvements**
+- **✅ Async Processing**: File uploads now use thread pools to prevent blocking
+- **✅ Optimized Token Estimation**: Smart calculation prevents false token limit errors
+- **✅ Graceful Error Handling**: Database errors don't stop file processing
+- **✅ Clean Terminal Output**: Reduced error spam and cleaner logging
+- **✅ Database Schema**: Created proper `conversation_files` table structure
+
+#### **⚡ Performance Fixes**
+**Before:**
+```
+WARNING:asyncio:Executing <Task> took 4.015 seconds
+ERROR:file_manager:Supabase insert error: {'message': 'JSON could not be generated'}
+```
+
+**After:**
+```
+📄 Processing file: document.pdf
+✅ File processed: document.pdf
+📊 Token estimation: Query=15, File overhead=200, Total=215
+```
+
+#### **🧮 Smart Token Estimation**
+- **Old Logic**: `file_content_length ÷ 4` = Could exceed 10,000+ tokens for large files
+- **New Logic**: `query_tokens + min(200, file_length ÷ 10)` = Capped at reasonable limits
+- **Result**: File uploads work within tier token limits
+
+#### **🗄️ Database Integration**
+```sql
+-- Auto-created conversation_files table
+CREATE TABLE conversation_files (
+    id BIGSERIAL PRIMARY KEY,
+    file_id VARCHAR(255) UNIQUE,
+    user_id VARCHAR(255),
+    conversation_id VARCHAR(255),
+    original_filename VARCHAR(500),
+    file_size BIGINT,
+    processed_content TEXT,
+    upload_timestamp TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### **📋 Setup Instructions**
+1. **Run Database Setup**: `python setup_database.py`
+2. **Create Table**: Copy SQL from `database_schema.sql` to Supabase
+3. **Test Upload**: Files will work without terminal errors
+
 ## 🎮 **Soul Points Gamification System**
 
 Transform your entrepreneurial journey into an engaging adventure:
@@ -409,9 +513,21 @@ python app.py
 {
   "query": "Your entrepreneurial question",
   "user_id": "unique_user_identifier",
-  "user_tier": "wanderer|builder|architect|awakener"
+  "user_tier": "wanderer|builder|architect|awakener",
+  "nickname": "Roy",
+  "life_goal": "Create 100B business",
+  "business_vision": "AI-powered empire",
+  "preferred_tone": "direct and motivational",
+  "preferred_language": "English"
 }
 ```
+
+**Profile Fields (All Optional):**
+- `nickname`: User's preferred name for personalized responses
+- `life_goal`: User's life aspirations and long-term goals
+- `business_vision`: User's specific business vision and objectives
+- `preferred_tone`: Communication style preference (e.g., "professional", "casual", "direct")
+- `preferred_language`: Language for AI responses (e.g., "English", "Spanish", "French")
 
 **File Upload Request (multipart/form-data):**
 ```bash
@@ -419,36 +535,43 @@ curl -X POST http://localhost:8999/chat \
   -F "query=Analyze this document for my business strategy" \
   -F "user_id=entrepreneur_123" \
   -F "user_tier=builder" \
+  -F "nickname=Roy" \
+  -F "business_vision=AI-powered startup" \
+  -F "preferred_language=English" \
   -F "files=@document.pdf"
 ```
 
 **Note**: File uploads are restricted by tier:
-- **Wanderer**: File uploads not available (returns upgrade message)
-- **Builder**: 5MB limit, PDF/TXT/DOCX/PNG formats
-- **Architect**: 20MB limit, PDF/TXT/DOCX/PNG formats  
-- **Awakener**: 50MB limit, PDF/TXT/DOCX/PNG/MP4 formats
+- **Wanderer**: File uploads not available (returns error message with upgrade prompt)
+- **Builder**: 5MB limit, PDF/TXT/DOCX/PNG formats, optimized token estimation
+- **Architect**: 20MB limit, PDF/TXT/DOCX/PNG formats, enhanced processing
+- **Awakener**: 50MB limit, PDF/TXT/DOCX/PNG/MP4 formats, unlimited processing
 
-V5 Enhanced Response:
+V5 Enhanced Response with User Profile:
 ```json
 {
-  "response": "AI assistant response",
+  "response": "Roy, building your AI-powered empire requires strategic thinking. Here's your direct action plan...",
   "assistant_name": "Jarvis",
   "task_category": "business", 
   "model_used": "FirstStepAI V5 Intelligence Network",
-  "user_tier": "wanderer",
+  "user_tier": "builder",
   "crisis_detected": false,
   "soul_points_earned": 10,
   "token_info": {
-    "tokens_used": 150,
-    "assistant_tokens": 82,
+    "tokens_used": 215,
+    "assistant_tokens": 145,
     "mode": "normal",
-    "tokens_allocated": 150
+    "tokens_allocated": 215
   },
   "firststep_ai": {
     "mission": "Guiding 1M entrepreneurs to success",
     "community": "FirstStepAI Entrepreneur Network",
     "v5_ghost_team": "Active with unified prompts",
     "upgrade_available": true
+  },
+  "user_profile": {
+    "personalization_applied": true,
+    "fields_used": ["nickname", "business_vision", "preferred_tone", "preferred_language"]
   },
   "status": "success"
 }
@@ -696,8 +819,9 @@ Response:
 ### **File Upload Restriction Response (Wanderer Tier):**
 ```json
 {
-  "status": 200,
-  "message": "File uploads not available for Wanderer tier. Please upgrade your plan to upload files",
+  "status": "error",
+  "status_type": 403,
+  "response": "File uploads not available for Wanderer tier. Please upgrade your plan to upload files",
   "upgrade_url": "https://www.firststepai.tech/pricing",
   "current_tier": "wanderer"
 }
@@ -1188,9 +1312,12 @@ CORS_ORIGINS=www.firststepai.tech
 | `Module Not Found` | Run `pip install -r requirements.txt` |
 | `Port Already in Use` | Change PORT in .env or kill existing process |
 | `Token Limit Issues` | Check Redis connection and user tier |
+| `File Upload Errors` | Run `python setup_database.py` and create conversation_files table |
+| `File Token Limit Exceeded` | Update to latest version with optimized token estimation |
 | `YAML Parsing Error` | Check YAML syntax in prompt/*.yml files |
 | `Prompt Not Found` | Verify prompt/*.yml files exist and are readable |
 | `Template Variable Error` | Check {variable} syntax in YAML prompt templates |
+| `Profile Not Persisting` | Check Redis connection and user_id consistency |
 
 ### **🔍 Debug Commands**
 ```bash
@@ -1415,10 +1542,13 @@ git commit -m "Enhanced architect tier personality"
 **Built with ❤️ for the entrepreneur in everyone**  
 *FirstStepAI V5 - Where Ghost Team Intelligence meets Entrepreneurial Dreams* 🚀
 
-**V5 System Status**: ✅ **FULLY OPERATIONAL**  
+**V5.1 System Status**: ✅ **FULLY OPERATIONAL**  
 **V5 YAML Prompts**: ✅ **GHOST TEAM ARCHITECTURE ACTIVE**  
+**User Profiles**: ✅ **PERSONALIZATION ENGINE ACTIVE**  
+**Language Support**: ✅ **GLOBAL MULTILINGUAL RESPONSES**  
+**File Uploads**: ✅ **ASYNC PROCESSING & OPTIMIZED TOKENS**  
 **YAML Configuration**: ✅ **PROMPT/*.YML FILES LOADED**  
-**Redis**: ✅ **CONNECTED & HEALTHY**  
+**Redis**: ✅ **CONNECTED & HEALTHY WITH PROFILE STORAGE**  
 **Ghost Team**: ✅ **JARVIS UNIFIED BRAND VOICE WITH INVISIBLE SPECIALISTS**  
 **Multi-Layer Security**: ✅ **ARCHITECTURE PROTECTION ACTIVE**  
 **Memory**: ✅ **JARVIS-CENTERED CONVERSATION TRACKING**  
