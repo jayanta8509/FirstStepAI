@@ -65,7 +65,8 @@ async def store_data_supabase_v2(
     user_query: str,
     user_id: str,
     task_category: str,
-    chat_session_id: str
+    chat_session_id: str,
+    client_id: str
 ) -> DatabaseResponse:
     """
     Store AI interaction data in Supabase with comprehensive error handling
@@ -102,7 +103,8 @@ async def store_data_supabase_v2(
             "responce_id": response_id,
             "ai_response_length": len(ai_response),
             "user_query_length": len(user_query),
-            "chat_session_id" : chat_session_id
+            "chat_session_id" : chat_session_id,
+            "client_id":client_id
         }
         
         # Perform database insertion
@@ -155,7 +157,8 @@ async def store_data_supabase(
     user_query: str,
     user_id: str,
     task_category: str,
-    chat_session_id: str
+    chat_session_id: str,
+    client_id: str
 ) -> Optional[str]:
     """
     Backward compatible wrapper for the original function
@@ -163,7 +166,7 @@ async def store_data_supabase(
     """
     result = await store_data_supabase_v2(
         assistant_name, model_used, AI_response, 
-        user_query, user_id, task_category, chat_session_id
+        user_query, user_id, task_category, chat_session_id, client_id
     )
     
     return result.response_id if result.success else None

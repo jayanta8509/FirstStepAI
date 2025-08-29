@@ -577,6 +577,10 @@ async def chat():
             chat_session_id = data.get('chat_session_id')
             if not chat_session_id:
                 raise BadRequest("Missing required field: chat_session_id")
+            
+            client_id = data.get('client_id')
+            if not client_id:
+                raise BadRequest("Missing required field: client_id")
 
             user_tier = data.get('user_tier', 'wanderer')
             
@@ -689,7 +693,7 @@ async def chat():
 
             # Store interaction data in Supabase
             response_id = await store_data_supabase(
-                "Jarvis", model_used, response, query, user_id, task_category, chat_session_id
+                "Jarvis", model_used, response, query, user_id, task_category, chat_session_id, client_id
             )
             
             # Prepare response with FirstStepAI context and token information (identity protected)
@@ -755,6 +759,7 @@ async def chat_with_files():
         user_id = form_data.get('user_id')
         user_tier = form_data.get('user_tier', 'wanderer')
         chat_session_id = form_data.get('chat_session_id')
+        client_id = form_data.get('client_id')
         
         # Extract profile information from form data (convert to dict format)
         profile_data = {}
@@ -934,7 +939,7 @@ async def chat_with_files():
 
         # Store in Supabase
         response_id = await store_data_supabase(
-            "Jarvis", model_used, response, enhanced_query, user_id, task_category,chat_session_id
+            "Jarvis", model_used, response, enhanced_query, user_id, task_category,chat_session_id, client_id
         )
         
         # Prepare response
