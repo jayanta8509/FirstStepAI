@@ -46,7 +46,7 @@ from prompt_loader import (
 )
 from markitdwon import process_any_input
 from file_manager import upload_file, upload_file_async
-
+from memory_chat import DailyExecutionPlan_with_user_history,MonetizationPlan_with_user_history, store_messages_in_memory
 
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -966,7 +966,12 @@ async def chat_with_files():
                 "upgrade_available": user_tier != "awakener"
             }
         }
-        
+        if api_response ["status_type"] == 200:
+            # mem0 Store interaction with debug logging
+            await store_messages_in_memory(query, response, user_id)
+        else:
+            pass
+
         if uploaded_files:
             api_response["file_analysis"] = f"Analyzed {len(uploaded_files)} files and integrated content into response"
         
@@ -993,6 +998,119 @@ async def chat_with_files():
     except Exception as e:
         return jsonify({"error": f"Chat with files failed: {str(e)}", "status": "error"}), 500
 
+
+@quart_app.route('/Daily-Execution-Plan', methods=['POST'])
+async def DailyExecutionPlan():
+    try:
+        data = await request.get_json()
+        if not data:
+            raise BadRequest("No JSON data provided")
+
+        # Accept array of queries from frontend
+        queries = data.get('query')
+        if not queries:
+            raise BadRequest("Missing required field: query")
+        
+        # Handle both single string and array
+        if isinstance(queries, str):
+            queries = [queries]
+        elif not isinstance(queries, list):
+            raise BadRequest("Field 'query' must be string or array of strings")
+        
+        user_id = data.get('user_id')
+        if not user_id:
+            raise BadRequest("Missing required field: user_id")
+        
+        # Get alternative daily execution plans
+        response = await DailyExecutionPlan_with_user_history(user_id, queries)
+        
+        # Ensure response is a list of 3 alternatives
+        if isinstance(response, list):
+            # Clean up the alternatives to remove "Jarvis suggests:" prefix for frontend
+            cleaned_alternatives = []
+            for alt in response:
+                if alt.startswith("Jarvis suggests:"):
+                    cleaned_alternatives.append(alt[16:].strip())  # Remove "Jarvis suggests:" prefix
+                else:
+                    cleaned_alternatives.append(alt.strip())
+            
+            return jsonify({
+                "response": cleaned_alternatives,
+                "status": "success",
+                "status_type": 200,
+            }), 200
+        else:
+            # Fallback for single response - convert to list
+            return jsonify({
+                "response": [response],
+                "status": "success", 
+                "status_type": 200,
+                "alternatives_count": 1
+            }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "response": [f"An unexpected error occurred: {str(e)}"],
+            "status": "error",
+            "status_type": 500
+        }), 500
+
+
+@quart_app.route('/Monetization-Plan', methods=['POST'])
+async def MonetizationPlan():
+    try:
+        data = await request.get_json()
+        if not data:
+            raise BadRequest("No JSON data provided")
+
+        # Accept array of queries from frontend
+        queries = data.get('query')
+        if not queries:
+            raise BadRequest("Missing required field: query")
+        
+        # Handle both single string and array
+        if isinstance(queries, str):
+            queries = [queries]
+        elif not isinstance(queries, list):
+            raise BadRequest("Field 'query' must be string or array of strings")
+        
+        user_id = data.get('user_id')
+        if not user_id:
+            raise BadRequest("Missing required field: user_id")
+        
+        # Get alternative daily execution plans
+        response = await MonetizationPlan_with_user_history(user_id, queries)
+        
+        # Ensure response is a list of 3 alternatives
+        if isinstance(response, list):
+            # Clean up the alternatives to remove "Jarvis suggests:" prefix for frontend
+            cleaned_alternatives = []
+            for alt in response:
+                if alt.startswith("Jarvis suggests:"):
+                    cleaned_alternatives.append(alt[16:].strip())  # Remove "Jarvis suggests:" prefix
+                else:
+                    cleaned_alternatives.append(alt.strip())
+            
+            return jsonify({
+                "response": cleaned_alternatives,
+                "status": "success",
+                "status_type": 200,
+            }), 200
+        else:
+            # Fallback for single response - convert to list
+            return jsonify({
+                "response": [response],
+                "status": "success", 
+                "status_type": 200,
+                "alternatives_count": 1
+            }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "response": [f"An unexpected error occurred: {str(e)}"],
+            "status": "error",
+            "status_type": 500
+        }), 500
 
 @quart_app.route('/redis/health', methods=['GET'])
 async def redis_health():
