@@ -140,28 +140,25 @@ Use a professional but friendly tone and reference previous conversations when r
 
 
 
-async def MonetizationPlan_with_user_history(user_id: str, current_message, limit: int = 10):
+async def MonetizationPlan_with_user_history(user_id: str, passion: str, scale: str, business: str, limit: int = 10):
     """
-    Generate monetization strategies based on user's business idea and history
+    Generate monetization strategies based on user's passion, scale, and business type
     
     Args:
         user_id (str): Unique identifier for the user
-        current_message: Can be string or list of business idea queries
+        passion (str): What the user is passionate about
+        scale (str): The scale/size of business they want (e.g., "small", "medium", "large")
+        business (str): Type of business or industry
         limit (int): Number of previous memories to retrieve
     
     Returns:
         list: 3 monetization strategies for the business idea
     """
-    # Handle both single string and array inputs
-    if isinstance(current_message, list):
-        queries = current_message
-        business_idea = " | ".join(queries)
-    else:
-        queries = [current_message]
-        business_idea = current_message
+    # Create comprehensive business context from the new parameters
+    business_context = f"Passion: {passion}, Scale: {scale}, Business Type: {business}"
     
     # Retrieve user's history and preferences
-    user_memories = memory.search(query=business_idea, user_id=user_id, limit=limit)
+    user_memories = memory.search(query=business_context, user_id=user_id, limit=limit)
     all_memories = memory.get_all(user_id=user_id)
     
     # Build user context from memories
@@ -180,26 +177,31 @@ Previous Business Ideas and Conversations:
 {chr(10).join(history_context[:3])}  # Limit to recent 3 memories
 """
 
-    # Generate 3 monetization strategies
-    system_prompt = f"""You are Jarvis, the AI CEO and Co-Founder. Based on the user's business idea, create 3 SPECIFIC monetization strategies to turn their vision into revenue.
+    # Generate 3 monetization strategies tailored to passion, scale, and business type
+    system_prompt = f"""You are Jarvis, the AI CEO and Co-Founder. Based on the user's passion, desired business scale, and business type, create 3 SPECIFIC monetization strategies to turn their vision into revenue.
 
 {user_context}
 
-Business Idea to Monetize: {business_idea}
+USER'S BUSINESS PROFILE:
+- Passion: {passion}
+- Desired Scale: {scale}
+- Business Type: {business}
 
 INSTRUCTIONS:
-- Provide 3 distinct revenue generation strategies
-- Each strategy should be practical and actionable
-- Focus on different monetization models (subscription, one-time, affiliate, etc.)
+- Provide 3 distinct revenue generation strategies tailored to their passion and scale
+- Each strategy should align with their business type and desired scale
+- Focus on different monetization models (subscription, one-time, affiliate, marketplace, etc.)
+- Consider the scale preference (small = local/niche, medium = regional/scaling, large = global/enterprise)
 - Keep each strategy to 2-3 sentences maximum
 - Use a professional but friendly tone
-- Be specific about revenue streams, not generic advice
+- Be specific about revenue streams that match their passion and business type
+- Ensure strategies are realistic for the chosen scale
 
-Format: Provide 3 separate strategies as bullet points, each focusing on a different monetization approach."""
+Format: Provide 3 separate strategies as bullet points, each focusing on a different monetization approach that aligns with their passion, scale, and business type."""
     
     messages = [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": f"Generate 3 monetization strategies for: {business_idea}"}
+        {"role": "user", "content": f"Generate 3 monetization strategies for someone passionate about {passion}, wanting to build a {scale} scale {business} business."}
     ]
     
     response = openai_client.chat.completions.create(
@@ -240,18 +242,18 @@ Format: Provide 3 separate strategies as bullet points, each focusing on a diffe
     
     # Ensure we have exactly 3 strategies
     while len(strategies) < 3:
-        strategies.append(f"Create a subscription model around your {business_idea.lower()} with monthly recurring revenue.")
+        strategies.append(f"Create a subscription model around your {passion.lower()} in the {business.lower()} space with monthly recurring revenue appropriate for {scale} scale.")
     
     # Take only first 3 strategies and clean them
     final_strategies = []
     for i, strategy in enumerate(strategies[:3]):
         # Add monetization focus if not present
         if not any(word in strategy.lower() for word in ['$', 'revenue', 'price', 'cost', 'subscription', 'sell', 'monetize', 'income']):
-            strategy += " Focus on pricing that reflects the value you provide."
+            strategy += " Focus on pricing that reflects the value you provide and matches your scale preference."
         final_strategies.append(strategy)
     
     # Store the interaction
-    await store_messages_in_memory(business_idea, f"Monetization strategies: {final_strategies}", user_id)
+    await store_messages_in_memory(business_context, f"Monetization strategies: {final_strategies}", user_id)
     
     return final_strategies[:3]
 

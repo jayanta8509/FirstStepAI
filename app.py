@@ -1063,23 +1063,25 @@ async def MonetizationPlan():
         if not data:
             raise BadRequest("No JSON data provided")
 
-        # Accept array of queries from frontend
-        queries = data.get('query')
-        if not queries:
-            raise BadRequest("Missing required field: query")
+        # Get required fields
+        passion = data.get('passion')
+        if not passion:
+            raise BadRequest("Missing required field: passion")
         
-        # Handle both single string and array
-        if isinstance(queries, str):
-            queries = [queries]
-        elif not isinstance(queries, list):
-            raise BadRequest("Field 'query' must be string or array of strings")
+        scale = data.get('scale')
+        if not scale:
+            raise BadRequest("Missing required field: scale")
+        
+        business = data.get('business')
+        if not business:
+            raise BadRequest("Missing required field: business")
         
         user_id = data.get('user_id')
         if not user_id:
             raise BadRequest("Missing required field: user_id")
         
-        # Get alternative daily execution plans
-        response = await MonetizationPlan_with_user_history(user_id, queries)
+        # Get monetization strategies based on passion, scale, and business
+        response = await MonetizationPlan_with_user_history(user_id, passion, scale, business)
         
         # Ensure response is a list of 3 alternatives
         if isinstance(response, list):
