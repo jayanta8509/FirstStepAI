@@ -82,7 +82,7 @@ FirstStepAI V5 introduces the revolutionary **Ghost Team Architecture** - the wo
 **"Your Invisible Technical Architect - Consulted by Jarvis"**
 - 👻 **User Experience**: Completely invisible to users, consults with Jarvis internally
 - ✅ **Available to**: All tiers (unified prompt adapts to tier automatically)
-- ✅ **Model**: DeepSeek Reasoner with V5 Unified Technical Prompt
+- ✅ **Model**: gemini Reasoner with V5 Unified Technical Prompt
 - 🎯 **V5 Innovation**: Single unified prompt with tier-adaptive technical intelligence
 
 **V5 Tier-Adaptive Technical Intelligence:**
@@ -690,7 +690,7 @@ Response:
     "optimus": {
       "name": "Optimus",
       "role": "Technical Architect (Behind-the-Scenes Specialist)",
-      "model": "DeepSeek Reasoner",
+      "model": "gemini Reasoner",
       "available_tiers": ["wanderer", "builder", "architect", "awakener"],
       "accessible": true,
       "user_facing": false,
@@ -743,7 +743,7 @@ Response:
     }
   },
   "orchestration_model": "Jarvis is the only user-facing voice, backed by specialist AI team",
-  "models": ["GPT-4o with AI Orchestra", "Claude-3.5-Sonnet", "XAI Grok-3", "DeepSeek Reasoner"],
+  "models": ["GPT-4o with AI Orchestra", "Claude-3.5-Sonnet", "XAI Grok-3", "gemini 2.5-flash"],
   "version": "4.0.0",
   "storage": "Redis Cloud Production",
   "redis": {
@@ -855,13 +855,13 @@ Response:
 5. Copy the key (starts with `xai-`)
 6. **Cost**: ~$0.002-0.01 per 1K tokens (Grok-3)
 
-#### **⚙️ DeepSeek (Required for Optimus - All Tiers)**
-1. Visit [DeepSeek Platform](https://platform.deepseek.com/)
+#### **⚙️ Gemini (Required for Optimus - All Tiers)**
+1. Visit [Gemini Platform](https://ai.google.dev/gemini-api/docs/api-key)
 2. Register and verify account
 3. Navigate to API keys
 4. Generate new key
 5. Copy the key (starts with `sk-`)
-6. **Cost**: ~$0.001-0.002 per 1K tokens (DeepSeek Reasoner)
+6. **Cost**: ~$0.001-0.002 per 1K tokens (Gemini)
 
 ### **Step 2: Database Setup (Supabase)**
 

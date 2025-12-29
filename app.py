@@ -9,6 +9,7 @@ from langchain.chat_models import init_chat_model
 from langchain_anthropic import ChatAnthropic
 from langchain_xai import ChatXAI
 from langchain_deepseek import ChatDeepSeek
+from langchain_google_genai import ChatGoogleGenerativeAI
 from quart import Quart, request, jsonify
 from quart_cors import cors
 from langgraph.checkpoint.memory import MemorySaver
@@ -52,7 +53,8 @@ load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 claude_api_key = os.getenv("CLAUDE_API_KEY")
 grok_api_key = os.getenv("XAI_API_KEY")
-deepseek_api_key = os.getenv("DEEPSEEK_API_KEY")
+# deepseek_api_key = os.getenv("DEEPSEEK_API_KEY")
+gemini_api_key = os.getenv("GEMINI_API_KEY")
 
 
 quart_app = Quart(__name__)
@@ -225,13 +227,13 @@ elonix_model = ChatXAI(
     api_key=grok_api_key,
 )
 
-optimus_model = ChatDeepSeek(
-    model="deepseek-reasoner",
-    temperature=0.2,
+optimus_model = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    api_key=gemini_api_key,
+    temperature=1.0,
     max_tokens=None,
     timeout=None,
     max_retries=2,
-    api_key=deepseek_api_key,
 )
 
 celine_model = ChatAnthropic(
@@ -308,8 +310,8 @@ async def route_to_assistant(state: State):
             try:
                 optimus_unified_prompt = create_unified_optimus_prompt(user_tier, user_profile)
                 optimus_analysis = optimus_unified_prompt.invoke(state)
-                optimus_insight = await optimus_model.ainvoke(optimus_analysis)
-                specialist_insights.append(f"Technical Architecture Analysis: {optimus_insight.content}")
+                optimus_insight = await optimus_model.invoke(optimus_analysis)
+                specialist_insights.append(f"Technical Architecture Analysis: {optimus_insight.text}")
             except Exception as optimus_error:
                 print(f"❌ Optimus/DeepSeek Service Error: {optimus_error}")
                 # V5 Enhanced Fallback with tier-appropriate guidance
