@@ -45,7 +45,7 @@ from prompt_loader import (
     create_unified_optimus_prompt,
     create_unified_elonix_prompt
 )
-from markitdwon import process_any_input
+from markitdwon import process_any_input, is_youtube_url
 from file_manager import upload_file, upload_file_async
 from memory_chat import DailyExecutionPlan_with_user_history,MonetizationPlan_with_user_history, store_messages_in_memory
 
@@ -585,15 +585,49 @@ async def chat():
                 raise BadRequest("Missing required field: client_id")
 
             user_tier = data.get('user_tier', 'wanderer')
-            
+
             # Extract and store user profile information
             user_profile = extract_and_store_user_profile(data, user_id)
-            
+
+            # 🎬 YouTube URL Detection and Processing
+            # Check if query contains a YouTube URL and process it automatically
+            enhanced_query = query
+            if is_youtube_url(query):
+                print(f"🎬 YouTube URL detected in query: {query}")
+                try:
+                    video_content = process_any_input(query)
+                    if video_content and not video_content.startswith("❌"):
+                        # Successfully processed video - enhance query with content
+                        enhanced_query = f"""Please provide a comprehensive summary and analysis of the following YouTube video content.
+
+VIDEO SUMMARY:
+{video_content}
+
+Based on this video content, please provide:
+1. A clear summary of the key points
+2. Main insights and takeaways
+3. Any actionable advice mentioned
+4. Your perspective on how this relates to the user's entrepreneurial journey
+
+User's original message: "{query}"
+"""
+                        print(f"✅ YouTube video processed successfully, content length: {len(video_content)} chars")
+                    else:
+                        # Video processing failed, continue with original query
+                        print(f"⚠️ YouTube processing returned error or empty content, using original query")
+                except Exception as video_error:
+                    print(f"❌ Error processing YouTube video: {video_error}")
+                    # Continue with original query if video processing fails
+                    enhanced_query = query
+            else:
+                enhanced_query = query
+
             # Crisis detection for emergency override
             crisis_detected = detect_crisis(query)
-            
+
             # Estimate tokens for the query (rough estimation: 1 token ≈ 4 characters)
-            estimated_tokens = max(len(query) // 4, 50)  # Minimum 50 tokens
+            # Use enhanced_query length to account for video content
+            estimated_tokens = max(len(enhanced_query) // 4, 50)  # Minimum 50 tokens
             
             # Token limiting (skip for crisis situations)
             if not crisis_detected:
@@ -616,7 +650,7 @@ async def chat():
 
             # Use separate memory threads for each user with new format
             config = {"configurable": {"thread_id": f"{user_id}_jarvis_convo"}}
-            input_messages = [HumanMessage(query)]
+            input_messages = [HumanMessage(enhanced_query)]
 
             try:
                 output = await app.ainvoke(
@@ -835,20 +869,46 @@ async def chat_with_files():
                     except Exception as file_error:
                         print(f"❌ Error processing file {file.filename}: {file_error}")
                         continue
-        
+
+        # 🎬 YouTube URL Detection and Processing (for chat_with_files)
+        # Check if query contains a YouTube URL and process it automatically
+        youtube_context = ""
+        if is_youtube_url(query):
+            print(f"🎬 YouTube URL detected in query: {query}")
+            try:
+                video_content = process_any_input(query)
+                if video_content and not video_content.startswith("❌"):
+                    # Successfully processed video
+                    youtube_context = f"\n\n=== YOUTUBE VIDEO ===\n{video_content}\n"
+                    print(f"✅ YouTube video processed successfully, content length: {len(video_content)} chars")
+                else:
+                    # Video processing failed
+                    print(f"⚠️ YouTube processing returned error or empty content")
+            except Exception as video_error:
+                print(f"❌ Error processing YouTube video: {video_error}")
+
         # Crisis detection
         crisis_detected = detect_crisis(query)
         
-        # Estimate tokens (reasonable estimation for file uploads)
-        # Don't count full file content - use base query + reasonable file overhead
+        # Estimate tokens (reasonable estimation for file uploads and YouTube)
+        # Don't count full file content - use base query + reasonable overhead
         base_query_tokens = max(len(query) // 4, 50)
-        
+
+        total_overhead = 0
         if file_context:
-            # For file uploads: base query + reasonable file processing overhead
-            # File content is context, not main token usage
+            # For file uploads: reasonable file processing overhead
             file_overhead = min(200, len(file_context) // 10)  # Max 200 tokens for file overhead
-            estimated_tokens = base_query_tokens + file_overhead
-            print(f"📊 Token estimation: Query={base_query_tokens}, File overhead={file_overhead}, Total={estimated_tokens}")
+            total_overhead += file_overhead
+
+        if youtube_context:
+            # For YouTube videos: reasonable video content overhead
+            youtube_overhead = min(3000, len(youtube_context) // 10)  # Max 300 tokens for YouTube overhead
+            total_overhead += youtube_overhead
+            
+
+        if total_overhead > 0:
+            estimated_tokens = base_query_tokens + total_overhead
+            print(f"📊 Token estimation: Query={base_query_tokens}, Overhead={total_overhead}, Total={estimated_tokens}")
         else:
             estimated_tokens = base_query_tokens
         
@@ -868,9 +928,28 @@ async def chat_with_files():
         else:
             token_check = check_token_limits(user_id, user_tier, estimated_tokens, crisis_mode=True)
 
-        # Enhance query with file context
+        # Enhance query with file context and YouTube video content
         enhanced_query = query
-        if file_context:
+
+        # Add YouTube video context if present
+        if youtube_context:
+            enhanced_query = f"""Please provide a comprehensive summary and analysis of the following YouTube video content.
+
+--- YOUTUBE VIDEO SUMMARY ---
+{youtube_context}
+
+Based on this video content, please provide:
+1. A clear summary of the key points
+2. Main insights and takeaways
+3. Any actionable advice mentioned
+4. Your perspective on how this relates to the user's entrepreneurial journey
+
+User's original message: "{query}"
+"""
+            # Re-add file context if both exist
+            if file_context:
+                enhanced_query += f"\n\n--- FILE CONTEXT ---{file_context}\n\nAlso consider these uploaded files in your response."
+        elif file_context:
             enhanced_query = f"{query}\n\n--- FILE CONTEXT ---{file_context}\n\nBased on the uploaded files above, please respond to: {query}"
         
         # Use memory threads

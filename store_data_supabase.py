@@ -1,6 +1,7 @@
 import os
 import uuid
 import logging
+import warnings
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 from dataclasses import dataclass
@@ -8,6 +9,9 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Suppress Supabase deprecation warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="supabase")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
